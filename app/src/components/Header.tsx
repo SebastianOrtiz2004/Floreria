@@ -30,10 +30,7 @@ export default function Header() {
                             NOSOTROS
                             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-400 transition-all group-hover:w-full"></span>
                         </a>
-                        <a href="/envio" className="text-stone-600 hover:text-primary-700 font-medium text-sm tracking-wide transition-colors relative group">
-                            SEGUIMIENTO
-                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-400 transition-all group-hover:w-full"></span>
-                        </a>
+
                     </nav>
                     <div className="flex items-center">
                         <a
