@@ -1,0 +1,280 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+@theme {
+  /* Paleta Cherry Blossom (Inspirada en el catálogo PDF) - Luminosa y Clara */
+  --color-primary-50: #fff5f7;
+  /* Fondo casi blanco rosado */
+  --color-primary-100: #ffe3e8;
+  /* Rosa pastel fondo */
+  --color-primary-200: #ffc2cf;
+  /* Rosa bebé */
+  --color-primary-300: #ff9fb4;
+  --color-primary-400: #ff6b8b;
+  /* Títulos rosados/coral */
+  --color-primary-500: #f43f65;
+  /* Botones */
+  --color-primary-600: #db2755;
+  /* Hover botones */
+  --color-primary-700: #be123c;
+  --color-primary-800: #9f1239;
+  --color-primary-900: #881337;
+  --color-primary-950: #4c0519;
+
+  /* Accent: Toques crema/durazno para suavizar */
+  --color-accent-50: #ffffff;
+  --color-accent-100: #fff1f2;
+  --color-accent-200: #ffe4e6;
+  --color-accent-300: #fecdd3;
+  --color-accent-400: #fda4af;
+  --color-accent-500: #fb7185;
+  --color-accent-600: #e11d48;
+  --color-accent-700: #be123c;
+  --color-accent-700: #364f3f;
+  --color-accent-800: #2d3f33;
+
+  --font-serif: var(--font-playfair), serif;
+  --font-sans: var(--font-inter), sans-serif;
+
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slide-up: slide-up 0.5s ease-out;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+:root {
+  --background: #fff5f7;
+  /* Primary 50 */
+  --foreground: #4c0519;
+  /* Textos oscuros pero con tinte rojo */
+}
+
+@keyframes bloom {
+
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes gentle-sway {
+  0% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  25% {
+    transform: rotate(1deg) translateY(-5px);
+  }
+
+  75% {
+    transform: rotate(-1deg) translateY(0px);
+  }
+
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+}
+
+@keyframes drifting-petal-1 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(100px, 150px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes drifting-petal-2 {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.5);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: translate(-80px, 120px) rotate(-180deg) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes flower-wave {
+  0% {
+    transform: rotate(0deg) scale(1) skewX(0deg);
+  }
+
+  25% {
+    transform: rotate(3deg) scale(1.02) skewX(1deg);
+  }
+
+  50% {
+    transform: rotate(-2deg) scale(0.98) skewX(-1deg);
+  }
+
+  75% {
+    transform: rotate(1deg) scale(1.01) skewX(0.5deg);
+  }
+
+  100% {
+    transform: rotate(0deg) scale(1) skewX(0deg);
+  }
+}
+
+@keyframes petal-float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.8;
+  }
+
+  80% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(40px, 60px) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+@keyframes stem-growth {
+  0% {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    opacity: 0;
+  }
+
+  100% {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.animate-flower-wave {
+  transform-origin: bottom center;
+  animation: flower-wave 8s ease-in-out infinite;
+}
+
+.animate-flower-wave-delayed {
+  transform-origin: bottom center;
+  animation: flower-wave 10s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+.animate-petal-1 {
+  animation: petal-float 6s linear infinite;
+}
+
+.animate-petal-2 {
+  animation: petal-float 8s linear infinite;
+  animation-delay: 2s;
+}
+
+.animate-petal-3 {
+  animation: petal-float 7s linear infinite;
+  animation-delay: 4s;
+}
+
+.animate-stem-draw {
+  animation: stem-growth 3s ease-out forwards;
+}
+
+.animate-bloom {
+  animation: bloom 6s ease-in-out infinite;
+}
+
+.animate-gentle-sway {
+  animation: gentle-sway 10s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.animate-petal-drift-1 {
+  animation: drifting-petal-1 12s linear infinite;
+}
+
+.animate-petal-drift-2 {
+  animation: drifting-petal-2 15s linear infinite;
+  animation-delay: 5s;
+}
+
+.animate-petal-drift-3 {
+  animation: drifting-petal-1 14s linear infinite;
+  animation-delay: 2s;
+}
+
+@keyframes subtle-zoom {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+.animate-subtle-zoom {
+  animation: subtle-zoom 20s linear infinite alternate;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1a231e;
+    --foreground: #fce7f3;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-serif);
+}
