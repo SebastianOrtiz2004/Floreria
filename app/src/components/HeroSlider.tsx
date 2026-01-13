@@ -75,11 +75,11 @@ export default function HeroSlider() {
             {/* Overlay Global Unificador - Más suave para dejar ver las fotos */}
             <div className="absolute inset-0 z-20 bg-gradient-to-t from-primary-50/80 via-transparent to-primary-50/30 pointer-events-none" />
 
-            {/* Controles de Navegación */}
-            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 z-30 flex justify-between px-4 md:px-12 pointer-events-none">
+            {/* Controles de Navegación - Ocultos en móvil */}
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 z-30 hidden md:flex justify-between px-4 md:px-12 pointer-events-none">
                 <button
                     onClick={prevSlide}
-                    className="pointer-events-auto w-12 h-12 flex items-center justify-center rounded-full bg-white/30 backdrop-blur-md border border-white/50 text-primary-800 hover:bg-white hover:scale-110 transition-all duration-300 group shadow-sm hover:shadow-lg"
+                    className="pointer-events-auto w-12 h-12 flex items-center justify-center rounded-full bg-white/30 backdrop-blur-md border border-white/50 text-stone-800 hover:bg-white hover:scale-110 transition-all duration-300 group shadow-sm hover:shadow-lg"
                     aria-label="Anterior imagen"
                 >
                     <svg className="w-5 h-5 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@ export default function HeroSlider() {
 
                 <button
                     onClick={nextSlide}
-                    className="pointer-events-auto w-12 h-12 flex items-center justify-center rounded-full bg-white/30 backdrop-blur-md border border-white/50 text-primary-800 hover:bg-white hover:scale-110 transition-all duration-300 group shadow-sm hover:shadow-lg"
+                    className="pointer-events-auto w-12 h-12 flex items-center justify-center rounded-full bg-white/30 backdrop-blur-md border border-white/50 text-stone-800 hover:bg-white hover:scale-110 transition-all duration-300 group shadow-sm hover:shadow-lg"
                     aria-label="Siguiente imagen"
                 >
                     <svg className="w-5 h-5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

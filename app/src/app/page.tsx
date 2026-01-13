@@ -38,7 +38,7 @@ export default async function Home() {
   })) || [];
 
   return (
-    <div className="min-h-screen flex flex-col font-sans text-stone-900 bg-primary-50">
+    <div className="min-h-screen flex flex-col font-sans text-stone-900 bg-primary-50 overflow-x-hidden w-full max-w-[100vw]">
       <Header />
 
       <main className="flex-grow">
@@ -46,6 +46,9 @@ export default async function Home() {
         <section className="relative h-[90vh] flex items-center justify-center overflow-hidden bg-primary-50">
           {/* Slider de Fondo */}
           <HeroSlider />
+
+          {/* Overlay Oscuro para Legibilidad */}
+          <div className="absolute inset-0 bg-black/30 z-0"></div>
 
           {/* Decoración Floral Ultra-Premium - Izquierda */}
           <div className="absolute -left-20 bottom-0 w-[600px] h-[700px] pointer-events-none hidden lg:block z-0 opacity-60 mix-blend-multiply">
@@ -144,32 +147,32 @@ export default async function Home() {
             </svg>
           </div>
 
-          <div className="relative z-10 text-center px-4 max-w-5xl mx-auto animate-fade-in pt-10">
-            <div className="mb-6 inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-primary-100 text-primary-600 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse"></span>
-              <span className="text-xs font-bold tracking-widest uppercase">Diseño Floral de Autor</span>
+          <div className="relative z-10 text-center px-4 max-w-5xl mx-auto animate-fade-in pt-20 sm:pt-10">
+            <div className="mb-6 inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white/90 backdrop-blur-md border border-white/50 text-primary-900 shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse"></span>
+              <span className="text-[10px] sm:text-xs font-bold tracking-widest uppercase">Diseño Floral de Autor</span>
             </div>
 
-            <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold text-primary-900 mb-6 leading-tight drop-shadow-sm">
+            <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight drop-shadow-lg filter shadow-black/20">
               Exclusividad y arte<br />
-              <span className="italic font-light text-primary-500">en cada creación</span>
+              <span className="italic font-light text-white/90">en cada creación</span>
             </h1>
 
-            <p className="text-lg md:text-2xl text-primary-800/90 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+            <p className="text-base sm:text-lg md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-md">
               Transformamos sentimientos en obras maestras florales. Cada detalle cuenta una historia única.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
               <a
                 href="#catalogo"
-                className="group relative px-10 py-4 bg-primary-500 text-white rounded-full font-serif font-medium overflow-hidden transition-all shadow-lg hover:shadow-primary-300 hover:-translate-y-1"
+                className="group relative w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-primary-500 text-white rounded-full font-serif font-medium overflow-hidden transition-all shadow-xl hover:shadow-primary-500/40 hover:-translate-y-1"
               >
                 <span className="relative z-10">Ver Colección</span>
                 <div className="absolute inset-0 bg-primary-600 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
               </a>
               <a
                 href="https://wa.me/593995676815"
-                className="group flex items-center gap-2 text-primary-700 border-b border-primary-300 pb-1 hover:border-primary-600 transition-all hover:text-primary-900 font-medium"
+                className="group flex items-center justify-center gap-2 text-white/90 border-b border-white/40 pb-1 hover:border-white hover:text-white transition-all font-medium text-sm sm:text-base mt-2 sm:mt-0"
               >
                 <span>Solicitar Diseño Personalizado</span>
                 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
