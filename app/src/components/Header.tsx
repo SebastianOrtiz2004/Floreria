@@ -1,10 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Bloquear scroll cuando el menú está abierto
+    useEffect(() => {
+        if (isMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isMenuOpen]);
 
     return (
         <header className="fixed w-full top-0 z-50 transition-all duration-300 bg-white/90 backdrop-blur-md border-b border-stone-100 shadow-sm">
@@ -67,53 +85,96 @@ export default function Header() {
                 </div>
             </div>
 
-            {/* Menú Móvil Desplegable */}
-            {/* Menú Móvil Overlay - Pantalla Completa */}
-            {isMenuOpen && (
-                <div className="fixed inset-0 z-40 bg-white/95 backdrop-blur-xl animate-in fade-in duration-200 flex flex-col items-center justify-center">
-                    {/* Botón Cerrar */}
-                    <button
+            {/* Menú Móvil - Sidebar Profesional */}
+            {mounted && isMenuOpen && createPortal(
+                <div className="fixed inset-0 z-[9999] flex justify-end">
+                    {/* Overlay Oscuro con Blur */}
+                    <div
+                        className="absolute inset-0 bg-stone-900/30 backdrop-blur-sm transition-opacity duration-300"
                         onClick={() => setIsMenuOpen(false)}
-                        className="absolute top-6 right-6 p-2 rounded-full bg-stone-100/50 hover:bg-stone-200 transition-colors"
-                    >
-                        <svg className="w-8 h-8 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                    />
 
-                    <div className="w-full max-w-sm px-6 space-y-6 text-center">
-                        <div className="mb-10 transform translate-y-2">
-                            <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary-100">
-                                <span className="text-3xl">🌸</span>
+                    {/* Panel Lateral Deslizable */}
+                    <div className="relative w-full max-w-xs h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+                        {/* Cabecera del Menú */}
+                        <div className="flex items-center justify-between px-6 pt-8 pb-6 bg-white border-b border-stone-100">
+                            <div className="flex items-center gap-3">
+                                <div className="relative h-10 w-10 overflow-hidden rounded-full border border-primary-100 shadow-sm">
+                                    <Image src="/images/logo/logoi.jpg" alt="Logo" fill className="object-cover" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="font-serif text-lg font-bold text-primary-900 leading-none">El Tulipán</span>
+                                    <span className="text-[0.6rem] text-primary-500 uppercase tracking-widest mt-0.5">Diseño Floral</span>
+                                </div>
                             </div>
-                            <h2 className="font-serif text-2xl font-bold text-primary-900">Menú</h2>
+                            <button
+                                onClick={() => setIsMenuOpen(false)}
+                                className="p-2 -mr-2 text-stone-400 hover:text-primary-600 hover:bg-primary-50 rounded-full transition-colors"
+                                aria-label="Cerrar menú"
+                            >
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
 
-                        <a
-                            href="#catalogo"
-                            onClick={() => setIsMenuOpen(false)}
-                            className="block w-full py-4 text-xl font-medium text-stone-800 hover:text-primary-700 hover:bg-stone-50 rounded-2xl transition-all"
-                        >
-                            Catálogo
-                        </a>
-                        <a
-                            href="#nosotros"
-                            onClick={() => setIsMenuOpen(false)}
-                            className="block w-full py-4 text-xl font-medium text-stone-800 hover:text-primary-700 hover:bg-stone-50 rounded-2xl transition-all"
-                        >
-                            Nosotros
-                        </a>
-                        <div className="pt-6">
-                            <a
-                                href="https://wa.me/593995676815"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="block w-full bg-primary-600 text-white px-8 py-4 rounded-full text-lg font-medium shadow-xl shadow-primary-500/30 hover:bg-primary-700 hover:scale-[1.02] transition-all active:scale-95"
-                            >
-                                Pedir por WhatsApp
-                            </a>
+                        {/* Lista de Navegación */}
+                        <nav className="flex-1 px-6 py-8 overflow-y-auto">
+                            <ul className="space-y-1">
+                                <li>
+                                    <a
+                                        href="#catalogo"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="flex items-center justify-between py-4 text-stone-800 hover:text-primary-700 group border-b border-stone-50"
+                                    >
+                                        <span className="font-serif text-xl font-medium">Catálogo</span>
+                                        <svg className="w-5 h-5 text-stone-300 group-hover:text-primary-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#nosotros"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="flex items-center justify-between py-4 text-stone-800 hover:text-primary-700 group border-b border-stone-50"
+                                    >
+                                        <span className="font-serif text-xl font-medium">Nosotros</span>
+                                        <svg className="w-5 h-5 text-stone-300 group-hover:text-primary-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <div className="mt-10">
+                                <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-4">Contacto Directo</p>
+                                <a
+                                    href="https://wa.me/593995676815"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex items-center justify-center w-full bg-primary-700 text-white px-6 py-4 rounded-xl text-base font-medium shadow-lg hover:bg-primary-800 transition-all active:scale-[0.98]"
+                                >
+                                    <span className="mr-2">Hacer Pedido por WhatsApp</span>
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.698c1.005.572 1.903.87 3.05.87 4.961 0 5.061-6.195 5.061-6.195a6.6 6.6 0 0 0-5.305-5.622z" /></svg>
+                                </a>
+                            </div>
+                        </nav>
+
+                        {/* Pie de Panel */}
+                        <div className="p-6 border-t border-stone-50 bg-stone-50/50">
+                            <div className="flex items-center gap-3 opacity-70">
+                                <div className="h-8 w-8 relative overflow-hidden rounded-full border border-stone-200">
+                                    <Image src="/images/logo/logoi.jpg" alt="Logo" fill className="object-cover" />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-bold text-stone-800">Florería El Tulipán</p>
+                                    <p className="text-[10px] text-stone-500">Diseño Floral Exclusivo</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </header>
     );
