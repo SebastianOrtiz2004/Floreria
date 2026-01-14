@@ -14,7 +14,8 @@ const slides = [
         id: 2,
         // (Aprobada) Primer plano artístico de rosas
         image: "https://images.unsplash.com/photo-1496062031456-07b8f162a322?auto=format&fit=crop&w=2400&q=80",
-        alt: "Textura de rosas naturales"
+        alt: "Textura de rosas naturales",
+        objectPosition: "center 25%" // Subir el encuadre
     },
     {
         id: 3,
@@ -62,7 +63,8 @@ export default function HeroSlider() {
                         src={slide.image}
                         alt={slide.alt}
                         fill
-                        className="object-cover opacity-100 animate-subtle-zoom"
+                        className="object-cover opacity-100"
+                        style={{ objectPosition: (slide as any).objectPosition || 'center' }}
                         priority={index === 0}
                         unoptimized={true}
                     />

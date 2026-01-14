@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/data/products';
 
@@ -12,9 +13,9 @@ export default function ProductCard({ product }: ProductCardProps) {
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 
     return (
-        <div className="group bg-white rounded-lg shadow-sm hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-500 overflow-hidden border border-stone-100/50 hover:border-primary-100 relative">
-            {/* Imagen Vertical Elegante */}
-            <div className="relative h-[420px] w-full overflow-hidden bg-stone-50">
+        <div className="group bg-white rounded-lg shadow-sm hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-500 overflow-hidden border border-stone-100/50 hover:border-primary-100 relative flex flex-col h-full">
+            {/* Imagen Vertical Elegante - Clickable */}
+            <Link href={`/product/${product.id}`} className="relative h-[420px] w-full overflow-hidden bg-white block cursor-pointer">
                 <Image
                     src={product.image}
                     alt={product.name}
@@ -30,21 +31,23 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-3 py-1 text-sm font-serif font-medium text-primary-900 shadow-sm rounded-sm">
                     ${product.price.toFixed(2)}
                 </div>
-            </div>
+            </Link>
 
-            <div className="p-6 text-center bg-white">
+            <div className="p-6 text-center bg-white flex flex-col flex-grow">
                 <div className="mb-2">
                     <span className="text-[10px] uppercase tracking-[0.2em] font-medium text-primary-400">
                         {product.category}
                     </span>
                 </div>
 
-                <h3 className="text-xl font-serif font-medium text-primary-900 mb-3 leading-tight min-h-[56px] flex items-center justify-center">
-                    {product.name}
-                </h3>
+                <Link href={`/product/${product.id}`} className="block group-hover:text-primary-700 transition-colors">
+                    <h3 className="text-xl font-serif font-medium text-primary-900 mb-3 leading-tight min-h-[56px] flex items-center justify-center">
+                        {product.name}
+                    </h3>
+                </Link>
 
                 {/* Botón Desktop: Aparece sutilmente */}
-                <div className="pt-2">
+                <div className="pt-2 mt-auto">
                     <a
                         href={whatsappUrl}
                         target="_blank"

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
@@ -33,7 +34,7 @@ export default function Header() {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-20">
-                    <div className="flex-shrink-0 flex items-center gap-3">
+                    <Link href="/" className="flex-shrink-0 flex items-center gap-3 hover:opacity-90 transition-opacity">
                         <div className="relative h-12 w-12 sm:h-16 sm:w-16 overflow-hidden rounded-full border-2 border-primary-100 shadow-sm">
                             <Image src="/images/logo/logoi.jpg" alt="Florería El Tulipán" fill className="object-cover" />
                         </div>
@@ -43,7 +44,7 @@ export default function Header() {
                             </h1>
                             <span className="text-[0.55rem] sm:text-[0.65rem] uppercase tracking-[0.2em] text-primary-500 mt-1">Diseño Floral</span>
                         </div>
-                    </div>
+                    </Link>
 
                     {/* Menú Desktop */}
                     <nav className="hidden md:flex space-x-10">

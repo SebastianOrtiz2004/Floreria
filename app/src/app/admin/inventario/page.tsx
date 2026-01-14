@@ -30,6 +30,7 @@ export default function InventoryPage() {
 
     // Estados de UI/Formulario
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+    const [editingProductId, setEditingProductId] = useState<number | null>(null); // ID del producto en edición
     const [newCategoryName, setNewCategoryName] = useState('');
     const [newProduct, setNewProduct] = useState({
         name: '',
@@ -59,8 +60,7 @@ export default function InventoryPage() {
             if (catError) throw catError;
             setCategories(cats || []);
 
-            // 2. Cargar Productos (con Join a categorías si es posible, o manual)
-            // Supabase permite joins simples si hay foreign keys configuradas correctamente
+            // 2. Cargar Productos (con Join a categorías)
             const { data: prods, error: prodError } = await supabase
                 .from('products')
                 .select(`
@@ -71,10 +71,15 @@ export default function InventoryPage() {
 
             if (prodError) throw prodError;
 
-            // Formatear datos para aplanar la estructura si viene anidada
-            const formattedProducts = prods?.map(p => ({
-                ...p,
-                category_name: p.categories?.name || 'Sin Categoría'
+            // Formatear datos
+            const formattedProducts = prods?.map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                price: p.price,
+                category_id: p.category_id,
+                category_name: p.categories?.name || 'Sin Categoría',
+                image_url: p.image_url,
+                description: p.description
             })) || [];
 
             setProducts(formattedProducts);
@@ -98,7 +103,7 @@ export default function InventoryPage() {
             if (error) throw error;
 
             setNewCategoryName('');
-            fetchData(); // Recargar datos
+            fetchData();
             alert('Categoría agregada exitosamente');
         } catch (error) {
             console.error('Error al crear categoría:', error);
@@ -106,20 +111,54 @@ export default function InventoryPage() {
         }
     };
 
-    // Función para manejar la selección de archivo
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setImageFile(file);
-            // Crear URL temporal para previsualización
             setImagePreview(URL.createObjectURL(file));
         }
     };
 
-    const handleCreateProduct = async (e: React.FormEvent) => {
+    // Abrir modal para crear nuevo
+    const openCreateModal = () => {
+        setEditingProductId(null);
+        setNewProduct({
+            name: '',
+            price: 0,
+            category_id: categories[0]?.id || 0,
+            image_url: '',
+            description: ''
+        });
+        setImageFile(null);
+        setImagePreview('');
+        setIsProductModalOpen(true);
+    };
+
+    // Abrir modal para editar existente
+    const handleEditProduct = (product: Product) => {
+        setEditingProductId(product.id);
+        setNewProduct({
+            name: product.name,
+            price: product.price,
+            category_id: product.category_id,
+            image_url: product.image_url,
+            description: product.description || ''
+        });
+        setImageFile(null);
+        setImagePreview(product.image_url); // Mostrar imagen actual
+        setIsProductModalOpen(true);
+    };
+
+    const handleSaveProduct = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!imageFile) {
+        // Validaciones básicas
+        if (!newProduct.name || newProduct.price <= 0 || !newProduct.category_id) {
+            alert('Por favor completa todos los campos obligatorios');
+            return;
+        }
+
+        if (!editingProductId && !imageFile && !newProduct.image_url) {
             alert('Por favor selecciona una imagen para el producto');
             return;
         }
@@ -127,46 +166,61 @@ export default function InventoryPage() {
         setIsUploading(true);
 
         try {
-            // 1. Subir imagen a Supabase Storage
-            const fileExt = imageFile.name.split('.').pop();
-            const fileName = `${Date.now()}.${fileExt}`; // Nombre único
-            const filePath = `${fileName}`;
+            let finalImageUrl = newProduct.image_url;
 
-            const { error: uploadError } = await supabase.storage
-                .from('products')
-                .upload(filePath, imageFile);
+            // 1. Si hay nueva imagen, subirla
+            if (imageFile) {
+                const fileExt = imageFile.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+                const filePath = `${fileName}`;
 
-            if (uploadError) throw uploadError;
+                const { error: uploadError } = await supabase.storage
+                    .from('products')
+                    .upload(filePath, imageFile);
 
-            // 2. Obtener URL pública
-            const { data: { publicUrl } } = supabase.storage
-                .from('products')
-                .getPublicUrl(filePath);
+                if (uploadError) throw uploadError;
 
-            // 3. Guardar producto en BDD con la URL de la imagen
-            const { error: dbError } = await supabase.from('products').insert([{
-                name: newProduct.name,
-                price: newProduct.price,
-                category_id: newProduct.category_id,
-                image_url: publicUrl, // Guardamos la URL generada
-                description: newProduct.description
-            }]);
+                const { data: { publicUrl } } = supabase.storage
+                    .from('products')
+                    .getPublicUrl(filePath);
 
-            if (dbError) throw dbError;
+                finalImageUrl = publicUrl;
+            }
 
-            // Limpieza y éxito
+            // 2. Insertar o Actualizar en BDD
+            if (editingProductId) {
+                // UPDATE
+                const { error: dbError } = await supabase
+                    .from('products')
+                    .update({
+                        name: newProduct.name,
+                        price: newProduct.price,
+                        category_id: newProduct.category_id,
+                        image_url: finalImageUrl,
+                        description: newProduct.description
+                    })
+                    .eq('id', editingProductId);
+
+                if (dbError) throw dbError;
+                alert('Producto actualizado correctamente');
+            } else {
+                // INSERT
+                const { error: dbError } = await supabase.from('products').insert([{
+                    name: newProduct.name,
+                    price: newProduct.price,
+                    category_id: newProduct.category_id,
+                    image_url: finalImageUrl,
+                    description: newProduct.description
+                }]);
+
+                if (dbError) throw dbError;
+                alert('Producto creado correctamente');
+            }
+
+            // Limpieza
             setIsProductModalOpen(false);
-            setNewProduct({
-                name: '',
-                price: 0,
-                category_id: categories[0]?.id || 0,
-                image_url: '',
-                description: ''
-            });
-            setImageFile(null);
-            setImagePreview('');
+            setEditingProductId(null);
             fetchData();
-            alert('Producto creado correctamente con imagen');
 
         } catch (error: any) {
             console.error('Error:', error);
@@ -177,12 +231,11 @@ export default function InventoryPage() {
     };
 
     const handleDeleteProduct = async (id: number) => {
-        if (!confirm('¿Estás seguro de eliminar este producto de la base de datos?')) return;
+        if (!confirm('¿Estás seguro de eliminar este producto?')) return;
 
         try {
             const { error } = await supabase.from('products').delete().eq('id', id);
             if (error) throw error;
-
             setProducts(products.filter(p => p.id !== id));
         } catch (error) {
             console.error('Error eliminando:', error);
@@ -205,7 +258,7 @@ export default function InventoryPage() {
 
                 {activeTab === 'products' && (
                     <button
-                        onClick={() => setIsProductModalOpen(true)}
+                        onClick={openCreateModal}
                         className="group bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl text-sm font-medium flex items-center gap-3 transition-all shadow-lg shadow-primary-600/20 hover:shadow-primary-600/40 transform hover:-translate-y-0.5"
                     >
                         <div className="bg-white/20 p-1 rounded-lg group-hover:bg-white/30 transition-colors">
@@ -300,13 +353,24 @@ export default function InventoryPage() {
                                             </div>
                                         </td>
                                         <td className="px-8 py-4 text-right">
-                                            <button
-                                                onClick={() => handleDeleteProduct(product.id)}
-                                                className="text-stone-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                                                title="Eliminar producto"
-                                            >
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                            </button>
+                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => handleEditProduct(product)}
+                                                    className="text-stone-400 hover:text-blue-600 p-2 hover:bg-blue-50 rounded-lg transition-all"
+                                                    title="Editar producto"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteProduct(product.id)}
+                                                    className="text-stone-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-all"
+                                                    title="Eliminar producto"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -368,8 +432,10 @@ export default function InventoryPage() {
                     <div className="bg-white/95 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/50 animate-in fade-in zoom-in-95 duration-200">
                         <div className="p-6 border-b border-stone-100 flex justify-between items-center bg-white/50 p-6">
                             <div>
-                                <h3 className="font-serif font-bold text-2xl text-stone-900">Nuevo Producto</h3>
-                                <p className="text-sm text-stone-500 mt-1">Completa los detalles para publicar.</p>
+                                <h3 className="font-serif font-bold text-2xl text-stone-900">
+                                    {editingProductId ? 'Editar Producto' : 'Nuevo Producto'}
+                                </h3>
+                                <p className="text-sm text-stone-500 mt-1">Completa los detalles para {editingProductId ? 'editar' : 'publicar'}.</p>
                             </div>
                             <button
                                 onClick={() => setIsProductModalOpen(false)}
@@ -379,7 +445,7 @@ export default function InventoryPage() {
                             </button>
                         </div>
 
-                        <form onSubmit={handleCreateProduct} className="p-8 space-y-8 overflow-y-auto">
+                        <form onSubmit={handleSaveProduct} className="p-8 space-y-8 overflow-y-auto">
                             {/* Sección 1: Detalles Básicos */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-4">
@@ -454,11 +520,15 @@ export default function InventoryPage() {
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             setImageFile(null);
+                                                            if (editingProductId) {
+                                                                // Si estamos editando y eliminamos imagen
+                                                            }
                                                             setImagePreview('');
+                                                            setNewProduct({ ...newProduct, image_url: '' });
                                                         }}
                                                         className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-all"
                                                     >
-                                                        Eliminar Imagen
+                                                        Cambiar / Eliminar
                                                     </button>
                                                 </div>
                                             </div>
@@ -519,11 +589,11 @@ export default function InventoryPage() {
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
-                                            Subiendo Imagen...
+                                            {editingProductId ? 'Actualizando...' : 'Guardando...'}
                                         </>
                                     ) : (
                                         <>
-                                            <span>Guardar Producto</span>
+                                            <span>{editingProductId ? 'Actualizar Producto' : 'Guardar Producto'}</span>
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                                         </>
                                     )}

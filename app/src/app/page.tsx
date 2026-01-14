@@ -43,12 +43,12 @@ export default async function Home() {
 
       <main className="flex-grow">
         {/* Hero Section - Estilo "Cherry Blossom" Luminoso */}
-        <section className="relative h-[90vh] flex items-center justify-center overflow-hidden bg-primary-50">
+        <section className="relative h-screen flex items-center justify-center overflow-hidden bg-primary-50">
           {/* Slider de Fondo */}
           <HeroSlider />
 
           {/* Overlay Oscuro para Legibilidad */}
-          <div className="absolute inset-0 bg-black/30 z-0"></div>
+          <div className="absolute inset-0 bg-black/30 z-0 pointer-events-none"></div>
 
           {/* Decoración Floral Ultra-Premium - Izquierda */}
           <div className="absolute -left-20 bottom-0 w-[600px] h-[700px] pointer-events-none hidden lg:block z-0 opacity-60 mix-blend-multiply">
