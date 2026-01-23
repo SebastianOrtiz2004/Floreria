@@ -1,0 +1,14 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="circle-clip">
+      <circle cx="128" cy="128" r="128" />
+    </clipPath>
+  </defs>
+  <image
+    href="/images/logo/logoi.jpg"
+    width="256"
+    height="256"
+    preserveAspectRatio="xMidYMid slice"
+    clip-path="url(#circle-clip)"
+  />
+</svg>
