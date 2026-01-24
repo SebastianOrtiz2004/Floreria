@@ -45,8 +45,8 @@ export default function CatalogSection({ products, categories }: CatalogSectionP
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
                             className={`px-8 py-3 rounded-full text-sm font-semibold tracking-wide transition-all duration-300 ${cat === selectedCategory
-                                    ? 'bg-primary-900 text-white shadow-xl shadow-primary-900/10 transform scale-105'
-                                    : 'bg-white text-primary-900/70 hover:bg-primary-50 hover:text-primary-900 border border-transparent hover:border-primary-100'
+                                ? 'bg-primary-900 text-white shadow-xl shadow-primary-900/10 transform scale-105'
+                                : 'bg-white text-primary-900/70 hover:bg-primary-50 hover:text-primary-900 border border-transparent hover:border-primary-100'
                                 }`}
                         >
                             {cat}
@@ -55,7 +55,7 @@ export default function CatalogSection({ products, categories }: CatalogSectionP
                 </div>
 
                 {/* Grid de Productos */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-10 md:gap-y-16">
                     {filteredProducts.length > 0 ? (
                         filteredProducts.map((product) => (
                             <ProductCard key={product.id} product={product} />

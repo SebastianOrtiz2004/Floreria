@@ -195,9 +195,9 @@ export default async function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
               {/* Card 1 */}
-              <div className="bg-white p-8 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-10px_rgba(219,39,119,0.15)] transition-all duration-300 transform hover:-translate-y-2 border border-primary-50/50 group relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-2 h-full bg-primary-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary-500 transition-colors duration-300 shadow-sm text-primary-600 group-hover:text-white">
+              <div className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.1)] md:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-10px_rgba(219,39,119,0.15)] transition-all duration-300 transform hover:-translate-y-2 border border-primary-100/50 group relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-primary-500"></div>
+                <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 text-primary-600 shadow-sm border border-primary-100 group-hover:bg-primary-500 group-hover:text-white transition-colors duration-300">
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-primary-900 mb-4 group-hover:text-primary-700 transition-colors">Entrega Express</h3>
@@ -207,9 +207,9 @@ export default async function Home() {
               </div>
 
               {/* Card 2 */}
-              <div className="bg-white p-8 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-10px_rgba(219,39,119,0.15)] transition-all duration-300 transform hover:-translate-y-2 border border-primary-50/50 group relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-2 h-full bg-primary-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary-500 transition-colors duration-300 shadow-sm text-primary-600 group-hover:text-white">
+              <div className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.1)] md:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-10px_rgba(219,39,119,0.15)] transition-all duration-300 transform hover:-translate-y-2 border border-primary-100/50 group relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-primary-500"></div>
+                <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 text-primary-600 shadow-sm border border-primary-100 group-hover:bg-primary-500 group-hover:text-white transition-colors duration-300">
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-primary-900 mb-4 group-hover:text-primary-700 transition-colors">Frescura Garantizada</h3>
@@ -219,9 +219,9 @@ export default async function Home() {
               </div>
 
               {/* Card 3 */}
-              <div className="bg-white p-8 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-10px_rgba(219,39,119,0.15)] transition-all duration-300 transform hover:-translate-y-2 border border-primary-50/50 group relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-2 h-full bg-primary-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary-500 transition-colors duration-300 shadow-sm text-primary-600 group-hover:text-white">
+              <div className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.1)] md:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-10px_rgba(219,39,119,0.15)] transition-all duration-300 transform hover:-translate-y-2 border border-primary-100/50 group relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-primary-500"></div>
+                <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 text-primary-600 shadow-sm border border-primary-100 group-hover:bg-primary-500 group-hover:text-white transition-colors duration-300">
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-primary-900 mb-4 group-hover:text-primary-700 transition-colors">Compra Segura</h3>

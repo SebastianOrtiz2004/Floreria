@@ -30,7 +30,21 @@ export default function Footer() {
                         <h3 className="text-sm font-semibold text-white tracking-wider uppercase">Contacto</h3>
                         <ul className="mt-4 space-y-4">
                             <li className="flex items-center">
-                                <span className="text-primary-300">Ambato, Ecuador</span>
+                                <span className="text-primary-300">Avenida Cevallos entre Pasaje Rodó y Guayaquil, Ambato - Ecuador</span>
+                            </li>
+                            <li className="mt-2">
+                                <a
+                                    href="https://maps.app.goo.gl/ENGpiXYfjbyQjBz97?g_st=aw"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-all border border-white/10 hover:border-white/30 shadow-sm group"
+                                >
+                                    <svg className="w-4 h-4 text-primary-300 group-hover:text-white transition-colors animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Ver Ubicación en Mapa
+                                </a>
                             </li>
                             <li className="flex items-center">
                                 <a href="https://wa.me/593995676815" className="text-primary-300 hover:text-white transition-colors">

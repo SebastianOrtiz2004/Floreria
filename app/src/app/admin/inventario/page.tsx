@@ -31,6 +31,7 @@ export default function InventoryPage() {
     // Estados de UI/Formulario
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [editingProductId, setEditingProductId] = useState<number | null>(null); // ID del producto en edición
+    const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null); // ID de la categoría en edición
     const [newCategoryName, setNewCategoryName] = useState('');
     const [newProduct, setNewProduct] = useState({
         name: '',
@@ -91,25 +92,58 @@ export default function InventoryPage() {
         }
     };
 
-    const handleAddCategory = async (e: React.FormEvent) => {
+    const handleSaveCategory = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newCategoryName.trim()) return;
 
         try {
-            const { error } = await supabase
-                .from('categories')
-                .insert([{ name: newCategoryName }]);
+            if (editingCategoryId) {
+                // UPDATE
+                const { error } = await supabase
+                    .from('categories')
+                    .update({ name: newCategoryName })
+                    .eq('id', editingCategoryId);
 
-            if (error) throw error;
+                if (error) throw error;
+                alert('Categoría actualizada exitosamente');
+            } else {
+                // INSERT
+                const { error } = await supabase
+                    .from('categories')
+                    .insert([{ name: newCategoryName }]);
+
+                if (error) throw error;
+                alert('Categoría agregada exitosamente');
+            }
 
             setNewCategoryName('');
+            setEditingCategoryId(null);
             fetchData();
-            alert('Categoría agregada exitosamente');
-        } catch (error) {
-            console.error('Error al crear categoría:', error);
-            alert('Error: No se pudo crear la categoría');
+        } catch (error: any) {
+            console.error('Error al guardar categoría:', error);
+            alert('Error: ' + error.message);
         }
     };
+
+    const handleEditCategory = (category: Category) => {
+        setEditingCategoryId(category.id);
+        setNewCategoryName(category.name);
+    };
+
+    const handleDeleteCategory = async (id: number) => {
+        if (!confirm('¿Estás seguro de eliminar esta categoría?')) return;
+
+        try {
+            const { error } = await supabase.from('categories').delete().eq('id', id);
+            if (error) throw error;
+            setCategories(categories.filter(c => c.id !== id));
+            fetchData();
+        } catch (error: any) {
+            console.error('Error eliminando categoría:', error);
+            alert('Error al eliminar: ' + error.message);
+        }
+    };
+
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -298,85 +332,138 @@ export default function InventoryPage() {
             {/* Contenido Principal */}
             <div className="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden min-h-[500px]">
                 {activeTab === 'products' && (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
-                            <thead className="bg-stone-50/50 text-stone-500 border-b border-stone-100">
-                                <tr>
-                                    <th className="px-8 py-5 font-semibold w-[40%]">Producto</th>
-                                    <th className="px-6 py-5 font-semibold">Categoría</th>
-                                    <th className="px-6 py-5 font-semibold">Precio</th>
-                                    <th className="px-8 py-5 font-semibold text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-stone-100">
-                                {products.length === 0 ? (
+                    <>
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-stone-50/50 text-stone-500 border-b border-stone-100">
                                     <tr>
-                                        <td colSpan={4} className="px-6 py-20 text-center">
-                                            <div className="flex flex-col items-center justify-center text-stone-400">
-                                                <div className="w-16 h-16 bg-stone-50 rounded-full flex items-center justify-center mb-4">
-                                                    <svg className="w-8 h-8 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
-                                                </div>
-                                                <p className="text-lg font-medium text-stone-600">No hay productos aún</p>
-                                                <p className="text-sm">Empieza agregando uno nuevo a tu inventario.</p>
-                                            </div>
-                                        </td>
+                                        <th className="px-8 py-5 font-semibold w-[40%]">Producto</th>
+                                        <th className="px-6 py-5 font-semibold">Categoría</th>
+                                        <th className="px-6 py-5 font-semibold">Precio</th>
+                                        <th className="px-8 py-5 font-semibold text-right">Acciones</th>
                                     </tr>
-                                ) : products.map((product) => (
-                                    <tr key={product.id} className="group hover:bg-primary-50/10 transition-colors">
-                                        <td className="px-8 py-4">
-                                            <div className="flex items-center gap-4">
-                                                <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-stone-100 shadow-sm bg-stone-50 group-hover:scale-105 transition-transform duration-300">
-                                                    <Image
-                                                        src={product.image_url || '/placeholder.png'}
-                                                        alt={product.name}
-                                                        fill
-                                                        className="object-cover"
-                                                        unoptimized={true}
-                                                    />
+                                </thead>
+                                <tbody className="divide-y divide-stone-100">
+                                    {products.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={4} className="px-6 py-20 text-center">
+                                                <div className="flex flex-col items-center justify-center text-stone-400">
+                                                    <div className="w-16 h-16 bg-stone-50 rounded-full flex items-center justify-center mb-4">
+                                                        <svg className="w-8 h-8 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+                                                    </div>
+                                                    <p className="text-lg font-medium text-stone-600">No hay productos aún</p>
+                                                    <p className="text-sm">Empieza agregando uno nuevo a tu inventario.</p>
                                                 </div>
-                                                <div>
-                                                    <div className="font-semibold text-stone-900 text-base">{product.name}</div>
-                                                    {product.description && (
-                                                        <div className="text-xs text-stone-500 truncate max-w-[240px] mt-0.5">{product.description}</div>
-                                                    )}
+                                            </td>
+                                        </tr>
+                                    ) : products.map((product) => (
+                                        <tr key={product.id} className="group hover:bg-primary-50/10 transition-colors">
+                                            <td className="px-8 py-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-stone-100 shadow-sm bg-stone-50 group-hover:scale-105 transition-transform duration-300">
+                                                        <Image
+                                                            src={product.image_url || '/placeholder.png'}
+                                                            alt={product.name}
+                                                            fill
+                                                            className="object-cover"
+                                                            unoptimized={true}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-semibold text-stone-900 text-base">{product.name}</div>
+                                                        {product.description && (
+                                                            <div className="text-xs text-stone-500 truncate max-w-[240px] mt-0.5">{product.description}</div>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-600 border border-stone-200">
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-600 border border-stone-200">
+                                                    {product.category_name}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="font-mono text-stone-700 font-medium">
+                                                    ${product.price ? product.price.toFixed(2) : '0.00'}
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-2 text-stone-500">
+                                                    <button
+                                                        onClick={() => handleEditProduct(product)}
+                                                        className="hover:text-blue-600 p-2 hover:bg-blue-50 rounded-lg transition-all"
+                                                        title="Editar producto"
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteProduct(product.id)}
+                                                        className="hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-all"
+                                                        title="Eliminar producto"
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Mobile Cards View */}
+                        <div className="md:hidden grid grid-cols-1 gap-4 p-4">
+                            {products.length === 0 ? (
+                                <div className="text-center py-10 text-stone-500">
+                                    <p>No hay productos disponibles.</p>
+                                </div>
+                            ) : products.map((product) => (
+                                <div key={product.id} className="bg-white p-4 rounded-xl shadow-sm border border-stone-100 flex gap-4 items-center">
+                                    <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-stone-50 border border-stone-100">
+                                        <Image
+                                            src={product.image_url || '/placeholder.png'}
+                                            alt={product.name}
+                                            fill
+                                            className="object-cover"
+                                            unoptimized={true}
+                                        />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="font-semibold text-stone-900 truncate">{product.name}</h4>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="text-xs px-2 py-0.5 bg-stone-100 text-stone-600 rounded-full border border-stone-200">
                                                 {product.category_name}
                                             </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="font-mono text-stone-700 font-medium">
+                                            <span className="font-mono text-sm font-bold text-primary-700">
                                                 ${product.price ? product.price.toFixed(2) : '0.00'}
-                                            </div>
-                                        </td>
-                                        <td className="px-8 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button
-                                                    onClick={() => handleEditProduct(product)}
-                                                    className="text-stone-400 hover:text-blue-600 p-2 hover:bg-blue-50 rounded-lg transition-all"
-                                                    title="Editar producto"
-                                                >
-                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteProduct(product.id)}
-                                                    className="text-stone-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-all"
-                                                    title="Eliminar producto"
-                                                >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <button
+                                            onClick={() => handleEditProduct(product)}
+                                            className="p-3 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors shadow-sm active:scale-95"
+                                            title="Editar"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteProduct(product.id)}
+                                            className="p-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors shadow-sm active:scale-95"
+                                            title="Eliminar"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
 
                 {activeTab === 'categories' && (
@@ -390,19 +477,43 @@ export default function InventoryPage() {
                             <div className="space-y-3">
                                 {categories.map((cat) => (
                                     <div key={cat.id} className="group flex items-center justify-between p-4 bg-white rounded-xl border border-stone-200 hover:border-primary-200 hover:shadow-md transition-all">
-                                        <span className="font-medium text-stone-700 group-hover:text-primary-700">{cat.name}</span>
-                                        <span className="text-xs font-mono text-stone-400 bg-stone-50 px-3 py-1 rounded border border-stone-100">ID: {cat.id}</span>
+                                        <div className="flex items-center gap-3">
+                                            <span className="font-medium text-stone-700 group-hover:text-primary-700">{cat.name}</span>
+                                            <span className="text-xs font-mono text-stone-400 bg-stone-50 px-2 py-0.5 rounded border border-stone-100">ID: {cat.id}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={() => handleEditCategory(cat)}
+                                                className="p-2 text-stone-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                title="Editar"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteCategory(cat.id)}
+                                                className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Eliminar"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
                         {/* Panel Derecho: Formulario */}
-                        <div className="bg-stone-50 p-8 rounded-2xl border border-stone-100">
-                            <h3 className="text-lg font-bold text-stone-800 mb-2">Nueva Categoría</h3>
-                            <p className="text-stone-500 text-sm mb-6">Agrega una nueva clasificación para organizar tus productos.</p>
+                        <div className="bg-stone-50 p-8 rounded-2xl border border-stone-100 h-fit sticky top-6">
+                            <h3 className="text-lg font-bold text-stone-800 mb-2">
+                                {editingCategoryId ? 'Editar Categoría' : 'Nueva Categoría'}
+                            </h3>
+                            <p className="text-stone-500 text-sm mb-6">
+                                {editingCategoryId
+                                    ? 'Modifica el nombre de la categoría seleccionada.'
+                                    : 'Agrega una nueva clasificación para organizar tus productos.'}
+                            </p>
 
-                            <form onSubmit={handleAddCategory} className="space-y-4">
+                            <form onSubmit={handleSaveCategory} className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-stone-700 mb-1.5">Nombre de la Categoría</label>
                                     <input
@@ -413,15 +524,30 @@ export default function InventoryPage() {
                                         className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition-all outline-none bg-white text-stone-900 placeholder:text-stone-400"
                                     />
                                 </div>
-                                <button
-                                    type="submit"
-                                    disabled={!newCategoryName.trim()}
-                                    className="w-full bg-stone-900 hover:bg-black text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg shadow-stone-900/10 hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                                >
-                                    Agregar Categoría
-                                </button>
+                                <div className="flex gap-2">
+                                    {editingCategoryId && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setEditingCategoryId(null);
+                                                setNewCategoryName('');
+                                            }}
+                                            className="px-4 py-3 rounded-xl font-medium text-stone-600 bg-white border border-stone-200 hover:bg-stone-50 transition-colors"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    )}
+                                    <button
+                                        type="submit"
+                                        disabled={!newCategoryName.trim()}
+                                        className="flex-1 bg-stone-900 hover:bg-black text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg shadow-stone-900/10 hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                    >
+                                        {editingCategoryId ? 'Actualizar' : 'Agregar Categoría'}
+                                    </button>
+                                </div>
                             </form>
                         </div>
+
                     </div>
                 )}
             </div>
