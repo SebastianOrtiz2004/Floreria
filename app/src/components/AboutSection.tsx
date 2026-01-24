@@ -52,6 +52,7 @@ export default function AboutSection() {
                         </div>
                     </div>
 
+
                     {/* Composición de Imágenes */}
                     <div className="order-1 lg:order-2 relative">
                         <div className="relative h-[600px] w-full rounded-2xl overflow-hidden shadow-2xl">
@@ -59,7 +60,7 @@ export default function AboutSection() {
                                 src="/images/florista.jpeg"
                                 alt="Florista trabajando en su taller floral"
                                 fill
-                                className="object-cover object-top hover:scale-105 transition-transform duration-700"
+                                className="object-cover object-[center_0%] hover:scale-105 transition-transform duration-700"
                                 unoptimized={true}
                             />
                             {/* Overlay degradado */}
