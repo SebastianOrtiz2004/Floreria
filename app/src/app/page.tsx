@@ -155,12 +155,12 @@ export default async function Home() {
             </div>
 
             <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight drop-shadow-lg filter shadow-black/20">
-              Exclusividad y arte<br />
-              <span className="italic font-light text-white/90">en cada creación</span>
+              Florería El Tulipán<br />
+              <span className="italic font-light text-white/90">en Ambato</span>
             </h1>
 
             <p className="text-base sm:text-lg md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-md">
-              Transformamos sentimientos en obras maestras florales. Cada detalle cuenta una historia única.
+              Envíos a domicilio de <strong>arreglos florales</strong>, <strong>ramos de rosas</strong> y regalos personalizados en <strong>Ambato</strong> y todo Tungurahua.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
@@ -178,6 +178,24 @@ export default async function Home() {
                 <span>Solicitar Diseño Personalizado</span>
                 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
               </a>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN SEO: TEXTO NATURAL */}
+        <section className="py-16 bg-white text-center">
+          <div className="max-w-4xl mx-auto px-6">
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary-900 mb-6">
+              ¿Buscas flores a domicilio en Ambato?
+            </h2>
+            <div className="space-y-4 text-stone-600 text-lg leading-relaxed">
+              <p>
+                En <strong>Florería El Tulipán</strong> (ubicados en Av. Cevallos), nos especializamos en crear momentos inolvidables.
+                Ya sea para San Valentín, Día de la Madre, condolencias o aniversarios, nuestros arreglos llegan frescos y a tiempo.
+              </p>
+              <p>
+                Aceptamos transferencias bancarias y coordinamos todo vía WhatsApp para tu comodidad.
+              </p>
             </div>
           </div>
         </section>
