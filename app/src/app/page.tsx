@@ -3,6 +3,7 @@ import Footer from '@/components/Footer';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import HeroSlider from '@/components/HeroSlider';
 import CatalogSection from '@/components/CatalogSection';
+import AboutSection from '@/components/AboutSection';
 import { supabase } from '@/lib/supabase';
 
 // Revalidate data every 60 seconds (ISR)
@@ -210,11 +211,11 @@ export default async function Home() {
               <div className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.1)] md:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-10px_rgba(219,39,119,0.15)] transition-all duration-300 transform hover:-translate-y-2 border border-primary-100/50 group relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-primary-500"></div>
                 <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 text-primary-600 shadow-sm border border-primary-100 group-hover:bg-primary-500 group-hover:text-white transition-colors duration-300">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                 </div>
-                <h3 className="text-2xl font-serif font-bold text-primary-900 mb-4 group-hover:text-primary-700 transition-colors">Frescura Garantizada</h3>
+                <h3 className="text-2xl font-serif font-bold text-primary-900 mb-4 group-hover:text-primary-700 transition-colors">Variedad Exclusiva</h3>
                 <p className="text-stone-600 font-medium leading-relaxed">
-                  Seleccionamos cada tallo a mano cada mañana. Flores vibrantes, aromáticas y duraderas que superan las expectativas más exigentes.
+                  Encuentra el detalle perfecto en nuestra amplia variedad: arreglos florales, plantas, rosas eternas, chocolates, peluches, velas aromáticas y mucho más.
                 </p>
               </div>
 
@@ -235,6 +236,9 @@ export default async function Home() {
 
         {/* Dynamic Catalog Section */}
         <CatalogSection products={products} categories={categories} />
+
+        {/* About Us Section */}
+        <AboutSection />
       </main>
 
       <Footer />
