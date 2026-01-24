@@ -30,6 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
+      <head>
+        <meta name="google-site-verification" content="pty1S2DQL79N-YpYUm5b-NS1-gvBmEE-zNFG6UH4mp4" />
+      </head>
       <body
         className={`${inter.variable} ${playfair.variable} antialiased`}
       >
