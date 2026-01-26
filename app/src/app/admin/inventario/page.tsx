@@ -282,7 +282,7 @@ export default function InventoryPage() {
     }
 
     return (
-        <div className="flex flex-col h-full space-y-8 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col space-y-8 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 pb-20">
             {/* Header Con Pestañas Estilizadas */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
                 <div>
