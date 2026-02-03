@@ -103,7 +103,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10 w-full">
+            <main className="flex-1 flex flex-col h-[100dvh] overflow-hidden relative z-10 w-full">
                 {/* Topbar sticky */}
                 <header className="bg-white border-b border-stone-200 px-4 sm:px-6 py-4 flex justify-between items-center shadow-sm z-10">
                     <div className="flex items-center gap-4">

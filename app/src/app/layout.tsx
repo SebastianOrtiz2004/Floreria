@@ -16,7 +16,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://floreriaeltulipan.com'),
-  title: "Florería El Tulipán | Arreglos Florales Exclusivos en Ambato",
+  title: "El Tulipán Florería | Arreglos Florales Exclusivos en Ambato",
   description: "Envía amor con flores frescas. Catálogo online, pedidos por WhatsApp y entregas a domicilio en Ambato.",
   alternates: {
     canonical: '/',
