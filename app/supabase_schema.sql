@@ -41,3 +41,5 @@ create policy "Admin Update Productos" on public.products for update using (true
 create policy "Admin Delete Productos" on public.products for delete using (true);
 
 create policy "Admin Insert Categorias" on public.categories for insert with check (true);
+create policy "Admin Update Categorias" on public.categories for update using (true);
+create policy "Admin Delete Categorias" on public.categories for delete using (true);
