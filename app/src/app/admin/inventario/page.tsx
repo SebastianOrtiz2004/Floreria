@@ -34,7 +34,8 @@ const Icons = {
     Trash: () => <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>,
     Edit: () => <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>,
     Info: () => <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-    Plus: () => <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+    Plus: () => <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>,
+    Filter: () => <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
 };
 
 export default function InventoryPage() {
@@ -44,6 +45,9 @@ export default function InventoryPage() {
     // --- Data State ---
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+
+    // --- Filter State ---
+    const [showUncategorizedOnly, setShowUncategorizedOnly] = useState(false);
 
     // --- UI/Form State ---
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -135,8 +139,12 @@ export default function InventoryPage() {
         }
     };
 
-    // --- Logic: Uncategorized Count ---
+    // --- Logic: Uncategorized Count & Filter ---
     const uncategorizedCount = products.filter(p => !p.category_id || p.category_name === 'Sin Categoría').length;
+
+    const displayedProducts = showUncategorizedOnly
+        ? products.filter(p => !p.category_id || p.category_name === 'Sin Categoría')
+        : products;
 
     // --- Logic: Category Management ---
     const handleSaveCategory = async (e: React.FormEvent) => {
@@ -352,14 +360,23 @@ export default function InventoryPage() {
                         <h4 className="hidden sm:block font-bold text-amber-800">Atención: Productos Sin Categoría</h4>
                         <p className="text-sm text-amber-700">
                             Tienes <strong>{uncategorizedCount}</strong> producto(s) sin categoría activa.
+                            {showUncategorizedOnly && <span className="block text-xs mt-1 text-amber-800 font-semibold">(Filtrando estos productos actualmente)</span>}
                         </p>
                     </div>
-                    <button
-                        onClick={() => setActiveTab('products')}
-                        className="text-xs font-semibold uppercase tracking-wide text-amber-900 border-b border-amber-900/20 hover:border-amber-900 transition-colors self-start sm:self-center"
-                    >
-                        Ver Productos
-                    </button>
+                    <div className="flex flex-col gap-2 self-start sm:self-center">
+                        <button
+                            onClick={() => {
+                                setActiveTab('products');
+                                setShowUncategorizedOnly(true);
+                                setTimeout(() => {
+                                    document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' });
+                                }, 100);
+                            }}
+                            className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg text-xs font-bold uppercase tracking-wide transition-colors"
+                        >
+                            Ver Productos
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -402,14 +419,30 @@ export default function InventoryPage() {
             </div>
 
             {/* --- Main Content --- */}
-            <div className="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden min-h-[500px]">
+            <div id="products-section" className="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden min-h-[500px] relative">
                 {activeTab === 'products' && (
                     <>
+                        {/* Clear Filter Banner within List */}
+                        {showUncategorizedOnly && (
+                            <div className="bg-stone-50 border-b border-stone-100 p-3 flex justify-between items-center animate-in slide-in-from-top-2">
+                                <span className="text-sm font-bold text-stone-700 flex items-center gap-2">
+                                    <Icons.Filter />
+                                    Mostrando solo "Sin Categoría" ({displayedProducts.length})
+                                </span>
+                                <button
+                                    onClick={() => setShowUncategorizedOnly(false)}
+                                    className="text-xs text-blue-600 font-bold hover:underline"
+                                >
+                                    Mostrar Todos
+                                </button>
+                            </div>
+                        )}
+
                         {/* Mobile View: Cards */}
                         <div className="block md:hidden p-4 space-y-4">
-                            {products.length === 0 ? (
-                                <p className="text-center text-stone-400 py-10">No hay productos.</p>
-                            ) : products.map(product => (
+                            {displayedProducts.length === 0 ? (
+                                <p className="text-center text-stone-400 py-10">No hay productos que coincidan.</p>
+                            ) : displayedProducts.map(product => (
                                 <div key={product.id} className="bg-white border border-stone-200 rounded-xl p-4 shadow-sm flex gap-4">
                                     <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-stone-100 flex-shrink-0">
                                         <Image src={product.image_url || '/placeholder.png'} alt={product.name} fill className="object-cover" unoptimized />
@@ -450,7 +483,7 @@ export default function InventoryPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-stone-100">
-                                    {products.map((product) => (
+                                    {displayedProducts.map((product) => (
                                         <tr key={product.id} className="group hover:bg-stone-50/50 transition-colors">
                                             <td className="px-8 py-4">
                                                 <div className="flex items-center gap-4">
@@ -489,7 +522,7 @@ export default function InventoryPage() {
                                             </td>
                                         </tr>
                                     ))}
-                                    {products.length === 0 && (
+                                    {displayedProducts.length === 0 && (
                                         <tr><td colSpan={4} className="text-center py-20 text-stone-400">No hay productos.</td></tr>
                                     )}
                                 </tbody>
@@ -539,23 +572,23 @@ export default function InventoryPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm">
                     <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
                         <div className="p-6 border-b border-stone-100 flex justify-between items-center">
-                            <h3 className="font-serif font-bold text-xl md:text-2xl">{editingProductId ? 'Editar Producto' : 'Nuevo Producto'}</h3>
-                            <button onClick={() => setIsProductModalOpen(false)} className="p-2 bg-stone-100 rounded-full hover:bg-stone-200"><Icons.X /></button>
+                            <h3 className="font-serif font-bold text-xl md:text-2xl text-stone-900">{editingProductId ? 'Editar Producto' : 'Nuevo Producto'}</h3>
+                            <button onClick={() => setIsProductModalOpen(false)} className="p-2 bg-stone-100 rounded-full hover:bg-stone-200 text-stone-500"><Icons.X /></button>
                         </div>
                         <form onSubmit={handleSaveProduct} className="p-6 md:p-8 space-y-6 overflow-y-auto">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-4">
-                                    <div><label className="block text-sm font-bold mb-1">Nombre</label><input required className="w-full p-3 border rounded-xl outline-none focus:border-primary-500" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} /></div>
-                                    <div><label className="block text-sm font-bold mb-1">Precio</label><input type="number" step="0.01" required className="w-full p-3 border rounded-xl outline-none focus:border-primary-500" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })} /></div>
+                                    <div><label className="block text-sm font-bold mb-1 text-stone-700">Nombre</label><input required className="w-full p-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-stone-900 bg-white" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} /></div>
+                                    <div><label className="block text-sm font-bold mb-1 text-stone-700">Precio</label><input type="number" step="0.01" required className="w-full p-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-stone-900 bg-white" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })} /></div>
                                 </div>
-                                <div><label className="block text-sm font-bold mb-1">Categoría</label>
-                                    <select className="w-full p-3 border rounded-xl outline-none focus:border-primary-500" value={newProduct.category_id} onChange={e => setNewProduct({ ...newProduct, category_id: parseInt(e.target.value) })}>
+                                <div><label className="block text-sm font-bold mb-1 text-stone-700">Categoría</label>
+                                    <select className="w-full p-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-stone-900 bg-white" value={newProduct.category_id} onChange={e => setNewProduct({ ...newProduct, category_id: parseInt(e.target.value) })}>
                                         <option value={0}>Seleccionar...</option>
                                         {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                     </select>
                                 </div>
                             </div>
-                            <div><label className="block text-sm font-bold mb-1">Imagen</label>
+                            <div><label className="block text-sm font-bold mb-1 text-stone-700">Imagen</label>
                                 <div className="border-2 border-dashed border-stone-300 rounded-xl p-6 text-center hover:bg-stone-50 transition-colors relative">
                                     {imagePreview ? (
                                         <div className="relative h-40 w-full"><Image src={imagePreview} alt="Preview" fill className="object-contain" /></div>
@@ -565,9 +598,9 @@ export default function InventoryPage() {
                                     }} />
                                 </div>
                             </div>
-                            <div><label className="block text-sm font-bold mb-1">Descripción</label><textarea rows={3} className="w-full p-3 border rounded-xl outline-none focus:border-primary-500" value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} /></div>
+                            <div><label className="block text-sm font-bold mb-1 text-stone-700">Descripción</label><textarea rows={3} className="w-full p-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-stone-900 bg-white" value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} /></div>
                             <div className="flex justify-end gap-3 pt-4">
-                                <button type="button" onClick={() => setIsProductModalOpen(false)} className="px-6 py-3 rounded-xl border hover:bg-stone-50 w-full md:w-auto">Cancelar</button>
+                                <button type="button" onClick={() => setIsProductModalOpen(false)} className="px-6 py-3 rounded-xl border border-stone-200 hover:bg-stone-50 w-full md:w-auto text-stone-700">Cancelar</button>
                                 <button type="submit" disabled={isUploading} className="px-6 py-3 rounded-xl bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 w-full md:w-auto">{isUploading ? 'Guardando...' : 'Guardar'}</button>
                             </div>
                         </form>
