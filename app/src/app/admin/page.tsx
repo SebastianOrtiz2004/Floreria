@@ -48,7 +48,7 @@ export default function OrdersPage() {
         delivery_time: '12:00',
         items_summary: '',
         total_amount: 0,
-        status: 'pendiente' as const
+        status: 'pendiente' as Order['status']
     });
 
     useEffect(() => {
