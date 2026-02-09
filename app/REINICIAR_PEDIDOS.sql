@@ -1,10 +1,15 @@
--- ⚠️ PELIGRO: ESTE SCRIPT BORRARÁ TODOS LOS PEDIDOS EXISTENTES
--- Y REINICIARÁ EL CONTADOR DE IDs (y por tanto los códigos PED-1, PED-2...) DESDE CERO.
+-- ⚠️ PELIGRO: ESTE SCRIPT BORRARÁ TODOS LOS PEDIDOS Y REINICIARÁ LOS CONTADORES
+-- --------------------------------------------------------------------------------
 
--- 1. Borrar todos los datos de la tabla y reiniciar la secuencia de IDs
-TRUNCATE TABLE public.orders RESTART IDENTITY;
+-- 1. Borrar todos los pedidos existentes
+TRUNCATE TABLE public.orders RESTART IDENTITY CASCADE;
 
--- Si por alguna razón el comando anterior no reinicia la secuencia en tu versión de Postgres,
--- puedes forzarlo con estas líneas adicionales (descoméntalas si es necesario):
--- DELETE FROM public.orders;
--- ALTER SEQUENCE public.orders_id_seq RESTART WITH 1;
+-- 2. Reiniciar la secuencia del ID principal (aunque TRUNCATE ya suele hacerlo)
+ALTER SEQUENCE public.orders_id_seq RESTART WITH 1;
+
+-- 3. IMPORTANTE: Reiniciar la secuencia personalizada de los códigos "SV-..."
+--    Esto hará que el próximo pedido sea SV-1
+ALTER SEQUENCE public.orders_sv_seq RESTART WITH 1;
+
+-- Confirmación visual (opcional)
+-- SELECT currval('public.orders_sv_seq');

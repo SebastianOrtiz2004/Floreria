@@ -20,6 +20,7 @@ interface Order {
     card_note?: string;
     total_amount: number;
     status: 'pendiente' | 'en_proceso' | 'en_ruta' | 'entregado' | 'cancelado';
+    delivery_type?: 'delivery' | 'pickup';
     created_at: string;
 }
 
@@ -81,7 +82,7 @@ export default function OrdersPage() {
     // --- Filters & Sort ---
     const [filterStatus, setFilterStatus] = useState<string>('all');
     const [orderBy, setOrderBy] = useState<'date' | 'created'>('date');
-    const [dateFilter, setDateFilter] = useState<string>(getLocalDate()); // Local Date
+    const [dateFilter, setDateFilter] = useState<string>(''); // Default: No Date Filter
     const [codeSearch, setCodeSearch] = useState(''); // Search by Code
 
     // --- View State (Production Ticket) ---
@@ -117,7 +118,8 @@ export default function OrdersPage() {
         delivery_date: getLocalDate(), // Local Date
         delivery_time: '12:00',
         card_note: '',
-        status: 'pendiente' as Order['status']
+        status: 'pendiente' as Order['status'],
+        delivery_type: 'delivery' as 'delivery' | 'pickup'
     });
 
     // --- Toast / Notification ---
@@ -399,7 +401,8 @@ export default function OrdersPage() {
             delivery_date: getLocalDate(), // Local Date Fix
             delivery_time: '12:00',
             card_note: '',
-            status: 'pendiente'
+            status: 'pendiente',
+            delivery_type: 'delivery'
         });
         setFormItems([]); // Reset items
     };
@@ -421,7 +424,8 @@ export default function OrdersPage() {
             delivery_date: order.delivery_date,
             delivery_time: order.delivery_time || '12:00',
             card_note: order.card_note || '',
-            status: order.status
+            status: order.status,
+            delivery_type: order.delivery_type || 'delivery'
         });
 
         // Load Items from JSON if available, else Fallback to Legacy Summary
@@ -450,7 +454,7 @@ export default function OrdersPage() {
 🕒 *Hora:* ${order.delivery_time}
 💐 *Detalle:* ${order.items_summary}
 
-⚠️ ${order.card_note ? `*NOTA:* ${order.card_note}` : ''}`;
+✉️ ${order.card_note ? `*Para Tarjeta:* ${order.card_note}` : ''}`;
 
         navigator.clipboard.writeText(text).then(() => {
             setToastMessage("¡Info copiada! Lista para pegar en WhatsApp.");
@@ -918,7 +922,7 @@ export default function OrdersPage() {
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <div className="flex items-center justify-end gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <div className="flex items-center justify-end gap-1">
                                                         <button
                                                             onClick={() => setViewingOrder(order)}
                                                             title="Ver Ticket de Producción"
@@ -972,7 +976,39 @@ export default function OrdersPage() {
                                 </div>
 
                                 {/* Delivery Info */}
-                                <div><label className="text-xs font-bold text-stone-500 uppercase">Dirección de Entrega</label><input className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-stone-900 placeholder:text-stone-400 bg-white" placeholder="Calle, Número, Referencia" value={formData.delivery_address} onChange={e => setFormData({ ...formData, delivery_address: e.target.value })} /></div>
+                                <div>
+                                    <label className="text-xs font-bold text-stone-500 uppercase">Tipo de Entrega</label>
+                                    <div className="flex gap-2 mt-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, delivery_type: 'delivery' })}
+                                            className={`flex-1 py-2 px-4 rounded-lg font-medium border transition-colors flex items-center justify-center gap-2 ${formData.delivery_type === 'delivery' ? 'bg-stone-900 text-white border-stone-900' : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'}`}
+                                        >
+                                            🚚 Envío a Domicilio
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, delivery_type: 'pickup' })}
+                                            className={`flex-1 py-2 px-4 rounded-lg font-medium border transition-colors flex items-center justify-center gap-2 ${formData.delivery_type === 'pickup' ? 'bg-stone-900 text-white border-stone-900' : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'}`}
+                                        >
+                                            🏪 Retiro en Local
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {formData.delivery_type === 'delivery' && (
+                                    <div>
+                                        <label className="text-xs font-bold text-stone-500 uppercase">Dirección de Entrega</label>
+                                        <textarea
+                                            rows={3}
+                                            className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-stone-900 placeholder:text-stone-400 bg-white resize-none"
+                                            placeholder="Calle, Número, Referencia..."
+                                            value={formData.delivery_address}
+                                            onChange={e => setFormData({ ...formData, delivery_address: e.target.value })}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') e.stopPropagation(); }}
+                                        />
+                                    </div>
+                                )}
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div><label className="text-xs font-bold text-stone-500 uppercase">Fecha Entrega</label><input type="date" required className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-stone-900 placeholder:text-stone-400 bg-white" value={formData.delivery_date} onChange={e => setFormData({ ...formData, delivery_date: e.target.value })} /></div>
