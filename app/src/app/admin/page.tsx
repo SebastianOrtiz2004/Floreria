@@ -21,6 +21,7 @@ interface Order {
     total_amount: number;
     status: 'pendiente' | 'en_proceso' | 'en_ruta' | 'entregado' | 'cancelado';
     delivery_type?: 'delivery' | 'pickup';
+    deposit_amount?: number;
     created_at: string;
 }
 
@@ -30,6 +31,7 @@ interface FormItem {
     price: number;
     quantity: number;
     image_url?: string;
+    notes?: string;
 }
 
 interface Product {
@@ -119,7 +121,8 @@ export default function OrdersPage() {
         delivery_time: '12:00',
         card_note: '',
         status: 'pendiente' as Order['status'],
-        delivery_type: 'delivery' as 'delivery' | 'pickup'
+        delivery_type: 'delivery' as 'delivery' | 'pickup',
+        deposit_amount: ''
     });
 
     // --- Toast / Notification ---
@@ -326,6 +329,8 @@ export default function OrdersPage() {
             items_summary: itemsSummary || 'Sin productos', // Fallback Text
             items_data: formItems, // JSON Data for detailed items list
             total_amount: totalAmount,
+            // If Delivery: Assume Full Payment (Policy). If Pickup: Use Input Amount.
+            deposit_amount: formData.delivery_type === 'delivery' ? totalAmount : parseFloat(formData.deposit_amount || '0'),
             image_url: mainImage
         };
 
@@ -402,7 +407,8 @@ export default function OrdersPage() {
             delivery_time: '12:00',
             card_note: '',
             status: 'pendiente',
-            delivery_type: 'delivery'
+            delivery_type: 'delivery',
+            deposit_amount: ''
         });
         setFormItems([]); // Reset items
     };
@@ -425,7 +431,8 @@ export default function OrdersPage() {
             delivery_time: order.delivery_time || '12:00',
             card_note: order.card_note || '',
             status: order.status,
-            delivery_type: order.delivery_type || 'delivery'
+            delivery_type: order.delivery_type || 'delivery',
+            deposit_amount: order.deposit_amount ? order.deposit_amount.toString() : ''
         });
 
         // Load Items from JSON if available, else Fallback to Legacy Summary
@@ -739,6 +746,21 @@ export default function OrdersPage() {
                                                     <div className="min-w-0">
                                                         <div className="font-bold text-stone-900 text-sm truncate">{order.client_name}</div>
                                                         {order.recipient_name && <div className="text-xs text-stone-500 truncate">Para: {order.recipient_name}</div>}
+
+                                                        {/* Financial Status Badge (ONLY FOR PICKUP) */}
+                                                        {order.delivery_type === 'pickup' && order.total_amount > 0 && (
+                                                            <div className="mt-1 flex gap-2">
+                                                                {(order.total_amount - (order.deposit_amount || 0)) > 0.01 ? (
+                                                                    <span className="text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded shadow-sm border border-red-500 flex items-center gap-1 animate-pulse">
+                                                                        <span>💰</span> Resta: ${(order.total_amount - (order.deposit_amount || 0)).toFixed(2)}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="text-[10px] font-bold bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded border border-teal-200">
+                                                                        Pagado ✅
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
 
@@ -755,8 +777,13 @@ export default function OrdersPage() {
                                                             )}
                                                             <div className="flex-1 min-w-0">
                                                                 <div className="font-bold text-stone-800 text-sm truncate">{order.items_data[0].name}</div>
+                                                                {order.items_data[0].notes && (
+                                                                    <div className="text-[10px] text-amber-600 font-medium truncate bg-amber-50 px-1 rounded border border-amber-100 mt-0.5">
+                                                                        📝 {order.items_data[0].notes}
+                                                                    </div>
+                                                                )}
                                                                 {order.items_data.length > 1 && (
-                                                                    <div className="text-xs text-stone-500">+{order.items_data.length - 1} más</div>
+                                                                    <div className="text-xs text-stone-500 mt-0.5">+{order.items_data.length - 1} más</div>
                                                                 )}
                                                                 <div className="text-xs font-bold text-stone-400 mt-0.5">${order.total_amount.toFixed(2)}</div>
                                                             </div>
@@ -883,18 +910,41 @@ export default function OrdersPage() {
                                                             Total piezas: {order.items_data.reduce((acc, item) => acc + item.quantity, 0)}
                                                         </div>
                                                     )}
+
+                                                    {/* List View Financial Status (ONLY FOR PICKUP) */}
+                                                    {order.delivery_type === 'pickup' && order.total_amount > 0 && (
+                                                        <div className="mt-2 text-xs font-mono font-bold">
+                                                            {(order.total_amount - (order.deposit_amount || 0)) > 0.01 ? (
+                                                                <span className="text-red-700 bg-red-100 px-2 py-1 rounded border border-red-200 flex items-center gap-1 w-fit font-bold">
+                                                                    <span>💰</span> Resta: ${(order.total_amount - (order.deposit_amount || 0)).toFixed(2)}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-teal-600 bg-teal-50 px-2 py-1 rounded border border-teal-100">
+                                                                    Pagado ✅
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     {order.items_data && order.items_data.length > 0 ? (
                                                         <div className="space-y-1.5">
                                                             {order.items_data.map((item, idx) => (
-                                                                <div key={idx} className="flex items-center gap-2 text-xs text-stone-700 bg-white border border-stone-100 p-1.5 rounded-lg shadow-sm">
-                                                                    <span className="bg-stone-900 text-white px-1.5 py-0.5 rounded text-[10px] font-bold min-w-[20px] text-center">
-                                                                        {item.quantity}x
-                                                                    </span>
-                                                                    <span className="font-medium truncate max-w-[140px]" title={item.name}>
-                                                                        {item.name}
-                                                                    </span>
+                                                                <div key={idx} className="flex flex-col gap-1 text-xs text-stone-700 bg-white border border-stone-100 p-1.5 rounded-lg shadow-sm">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <div className="bg-stone-900 text-white px-2 py-0.5 rounded text-[10px] font-black min-w-[24px] text-center shadow-sm">
+                                                                            {item.quantity}x
+                                                                        </div>
+                                                                        <span className="font-bold text-stone-900 truncate max-w-[180px]" title={item.name}>
+                                                                            {item.name}
+                                                                        </span>
+                                                                    </div>
+                                                                    {item.notes && (
+                                                                        <div className="text-[10px] text-amber-700 bg-amber-50 px-2 py-1 rounded border border-amber-100 font-medium ml-8 flex items-start gap-1">
+                                                                            <span>📝</span>
+                                                                            <span className="italic">{item.notes}</span>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -1039,26 +1089,39 @@ export default function OrdersPage() {
                                     {/* List of Added Items */}
                                     <div className="space-y-2 mb-2">
                                         {formItems.map((item, idx) => (
-                                            <div key={idx} className="flex items-center gap-3 bg-white p-2 rounded-lg border border-stone-200 shadow-sm">
-                                                {item.image_url ? (
-                                                    <img src={item.image_url} alt="" className="w-10 h-10 object-cover rounded-md" />
-                                                ) : (
-                                                    <div className="w-10 h-10 bg-stone-100 rounded-md flex items-center justify-center text-lg">💐</div>
-                                                )}
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="font-semibold text-sm text-stone-800 truncate">{item.name}</div>
-                                                    <div className="text-xs text-stone-500">${item.price} x {item.quantity}</div>
+                                            <div key={idx} className="flex flex-col bg-white p-3 rounded-lg border border-stone-200 shadow-sm gap-2">
+                                                <div className="flex items-center gap-3">
+                                                    {item.image_url ? (
+                                                        <img src={item.image_url} alt="" className="w-10 h-10 object-cover rounded-md" />
+                                                    ) : (
+                                                        <div className="w-10 h-10 bg-stone-100 rounded-md flex items-center justify-center text-lg">💐</div>
+                                                    )}
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="font-semibold text-sm text-stone-800 truncate">{item.name}</div>
+                                                        <div className="text-xs text-stone-500">${item.price} x {item.quantity}</div>
+                                                    </div>
+                                                    <div className="font-bold text-stone-900 text-sm">
+                                                        ${(item.price * item.quantity).toFixed(2)}
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setFormItems(prev => prev.filter((_, i) => i !== idx))}
+                                                        className="text-stone-400 hover:text-red-500 p-1"
+                                                    >
+                                                        <Icons.X />
+                                                    </button>
                                                 </div>
-                                                <div className="font-bold text-stone-900 text-sm">
-                                                    ${(item.price * item.quantity).toFixed(2)}
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setFormItems(prev => prev.filter((_, i) => i !== idx))}
-                                                    className="text-stone-400 hover:text-red-500 p-1"
-                                                >
-                                                    <Icons.X />
-                                                </button>
+                                                <input
+                                                    type="text"
+                                                    placeholder="📝 Nota del producto: (Ej: Cambiar color de rosas...)"
+                                                    className="w-full text-xs p-2 bg-stone-50 border border-stone-200 rounded-md outline-none focus:ring-1 focus:ring-primary-500 text-stone-700"
+                                                    value={item.notes || ''}
+                                                    onChange={(e) => {
+                                                        const newItems = [...formItems];
+                                                        newItems[idx].notes = e.target.value;
+                                                        setFormItems(newItems);
+                                                    }}
+                                                />
                                             </div>
                                         ))}
                                         {formItems.length === 0 && (
@@ -1145,6 +1208,39 @@ export default function OrdersPage() {
                                         <option value="cancelado">Cancelado</option>
                                     </select>
                                 </div>
+
+                                {/* Financials: Deposit & Balance (ONLY FOR PICKUP) */}
+                                {formData.delivery_type === 'pickup' && (
+                                    <div className="bg-stone-100 p-4 rounded-xl border border-stone-200">
+                                        <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">💰 Pagos y Saldos (Retiro en Local)</label>
+                                        <div className="flex gap-4 items-end">
+                                            <div className="flex-1">
+                                                <label className="text-[10px] font-bold text-stone-400 uppercase">Abono / Anticipo ($)</label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.01"
+                                                    className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-stone-900 bg-white"
+                                                    placeholder="0.00"
+                                                    value={formData.deposit_amount}
+                                                    onChange={e => setFormData({ ...formData, deposit_amount: e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="flex-1 text-right">
+                                                <div className="text-[10px] font-bold text-stone-400 uppercase">Total Pedido</div>
+                                                <div className="text-lg font-bold text-stone-900">
+                                                    ${formItems.reduce((acc, i) => acc + (i.price * i.quantity), 0).toFixed(2)}
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 text-right">
+                                                <div className="text-[10px] font-bold text-stone-400 uppercase">Saldo Pendiente</div>
+                                                <div className={`text-xl font-black ${(formItems.reduce((acc, i) => acc + (i.price * i.quantity), 0) - parseFloat(formData.deposit_amount || '0')) > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                                    ${(Math.max(0, formItems.reduce((acc, i) => acc + (i.price * i.quantity), 0) - parseFloat(formData.deposit_amount || '0'))).toFixed(2)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
 
 
                                 <div className="flex gap-3 pt-4 justify-end">
