@@ -490,8 +490,11 @@ export default function OrdersPage() {
     // --- Search Logic (Case Insensitive) ---
     const filteredOrders = orders.filter(o => {
         if (!codeSearch.trim()) return true;
-        const code = o.order_code || `PED-${o.id}`;
-        return code.toLowerCase().includes(codeSearch.toLowerCase().trim());
+        const search = codeSearch.toLowerCase().trim();
+        const code = (o.order_code || `PED-${o.id}`).toLowerCase();
+        const client = o.client_name.toLowerCase();
+
+        return code.includes(search) || client.includes(search);
     });
 
     const handleAddCustomProduct = () => {
@@ -628,10 +631,10 @@ export default function OrdersPage() {
                     </div>
                     <input
                         type="text"
-                        placeholder="Buscar Código (Ej: PED-A1B2)"
+                        placeholder="Buscar Código o Cliente..."
                         value={codeSearch}
                         onChange={(e) => setCodeSearch(e.target.value)}
-                        className="pl-10 w-full p-2.5 bg-yellow-50 border border-yellow-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-yellow-500 font-mono uppercase tracking-wider placeholder:text-stone-400 text-stone-900 font-bold"
+                        className="pl-10 w-full p-2.5 bg-yellow-50 border border-yellow-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-yellow-500 placeholder:text-stone-400 text-stone-900 font-bold"
                     />
                 </div>
 
