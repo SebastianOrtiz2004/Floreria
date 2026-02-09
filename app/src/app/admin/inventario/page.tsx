@@ -60,7 +60,7 @@ export default function InventoryPage() {
         name: '',
         price: 0,
         category_id: 0,
-        image_url: 'https://images.unsplash.com/photo-1563241527-3af805364841?q=80&w=800',
+        image_url: '',
         description: ''
     });
 
@@ -126,7 +126,7 @@ export default function InventoryPage() {
                 price: p.price,
                 category_id: p.category_id,
                 category_name: p.categories?.name || 'Sin Categoría',
-                image_url: p.image_url,
+                image_url: p.image_url || '',
                 description: p.description
             })) || [];
 
@@ -459,8 +459,8 @@ export default function InventoryPage() {
                                             <div className="flex gap-2">
                                                 <button onClick={() => {
                                                     setEditingProductId(product.id);
-                                                    setNewProduct({ name: product.name, price: product.price, category_id: product.category_id || 0, image_url: product.image_url, description: product.description });
-                                                    setImagePreview(product.image_url);
+                                                    setNewProduct({ name: product.name, price: product.price, category_id: product.category_id || 0, image_url: product.image_url || '', description: product.description });
+                                                    setImagePreview(product.image_url || '');
                                                     setIsProductModalOpen(true);
                                                 }} className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Icons.Edit /></button>
                                                 <button onClick={() => initiateDeleteProduct(product)} className="p-2 bg-red-50 text-red-600 rounded-lg"><Icons.Trash /></button>
@@ -511,10 +511,10 @@ export default function InventoryPage() {
                                                             name: product.name,
                                                             price: product.price,
                                                             category_id: product.category_id || 0,
-                                                            image_url: product.image_url,
+                                                            image_url: product.image_url || '',
                                                             description: product.description
                                                         });
-                                                        setImagePreview(product.image_url);
+                                                        setImagePreview(product.image_url || '');
                                                         setIsProductModalOpen(true);
                                                     }} className="p-2 text-stone-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><Icons.Edit /></button>
                                                     <button onClick={() => initiateDeleteProduct(product)} className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Icons.Trash /></button>
