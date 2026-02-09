@@ -1273,8 +1273,25 @@ export default function OrdersPage() {
                                 <h2 className="text-5xl font-mono font-black tracking-tighter mb-2">
                                     {viewingOrder.order_code || `PED-${viewingOrder.id}`}
                                 </h2>
-                                <div className="text-xl font-bold text-stone-300 mb-4 bg-white/10 inline-block px-4 py-1 rounded-lg">
-                                    Total: ${viewingOrder.total_amount.toFixed(2)}
+                                <div className="flex flex-col items-center gap-2 mb-4">
+                                    <div className="text-xl font-bold text-stone-300 bg-white/10 inline-block px-4 py-1 rounded-lg">
+                                        Total: ${viewingOrder.total_amount.toFixed(2)}
+                                    </div>
+
+                                    {/* Financial Status for Pickup - In Ticket Header */}
+                                    {viewingOrder.delivery_type === 'pickup' && viewingOrder.total_amount > 0 && (
+                                        <>
+                                            {(viewingOrder.total_amount - (viewingOrder.deposit_amount || 0)) > 0.01 ? (
+                                                <div className="bg-red-600 text-white px-4 py-1.5 rounded-lg animate-pulse shadow-lg border border-red-400 font-bold text-lg flex items-center gap-2">
+                                                    <span>💰</span> Resta: ${(viewingOrder.total_amount - (viewingOrder.deposit_amount || 0)).toFixed(2)}
+                                                </div>
+                                            ) : (
+                                                <div className="bg-emerald-500/20 text-emerald-200 px-3 py-1 rounded-lg border border-emerald-500/30 font-bold text-sm">
+                                                    Pagado Completamente ✅
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
                                 </div>
                                 <div className="flex flex-col items-center justify-center gap-1 text-stone-200">
                                     <div className="flex items-center gap-2 text-3xl font-bold text-white">
@@ -1305,7 +1322,13 @@ export default function OrdersPage() {
                                                     <div className="font-bold text-stone-900 text-lg">
                                                         {item.quantity}x {item.name}
                                                     </div>
-                                                    {!item.image_url && <span className="text-xs text-stone-400 italic">(Producto personalizado / Sin foto)</span>}
+                                                    {item.notes && (
+                                                        <div className="mt-1 text-sm text-amber-800 bg-amber-50 px-4 py-2 rounded-lg border border-amber-200 font-medium w-full text-center flex flex-col items-center gap-1">
+                                                            <span className="text-[10px] uppercase font-bold text-amber-400 tracking-widest">Nota de Preparación</span>
+                                                            <span>📝 {item.notes}</span>
+                                                        </div>
+                                                    )}
+                                                    {!item.image_url && <span className="text-xs text-stone-400 italic mt-1">(Producto personalizado / Sin foto)</span>}
                                                 </div>
                                             ))}
                                         </div>
