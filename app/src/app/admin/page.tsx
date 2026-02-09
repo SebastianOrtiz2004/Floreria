@@ -717,15 +717,20 @@ export default function OrdersPage() {
                                                 <div className={`absolute top-4 right-4 w-3 h-3 rounded-full ${statusColors[order.status].replace('text-', 'bg-').split(' ')[0]} ring-4 ring-white`}></div>
 
                                                 {/* Header: Time & Code */}
+                                                {/* Header: Time & Code */}
                                                 <div className="flex items-center gap-2 mb-3">
-                                                    <div className="bg-stone-900 text-white text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                                                    <div className={`text-white text-xs font-black px-3 py-1.5 rounded-lg shadow-sm tracking-wider ${order.delivery_type === 'pickup' ? 'bg-orange-500' : 'bg-blue-600'}`}>
                                                         {order.delivery_time.substring(0, 5)}
+                                                        <span className="ml-2 opacity-80 font-medium border-l border-white/30 pl-2">
+                                                            {order.delivery_type === 'pickup' ? 'RETIRO' : 'ENVÍO'}
+                                                        </span>
                                                     </div>
                                                     <div className="text-xs font-mono font-bold text-stone-400">
                                                         #{order.order_code || order.id}
                                                     </div>
                                                 </div>
 
+                                                {/* Client */}
                                                 {/* Client */}
                                                 <div className="flex items-center gap-3 mb-4">
                                                     <div className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 font-bold border border-stone-200 shrink-0">
@@ -784,7 +789,7 @@ export default function OrdersPage() {
                                 </div>
                             );
                         })}
-                    </div>
+                    </div >
                 )
             }
 
@@ -824,8 +829,17 @@ export default function OrdersPage() {
                                                             <span>{order.delivery_time.substring(0, 5)}</span>
                                                             <span className="text-xs font-bold text-stone-400 self-end mb-1">hrs</span>
                                                         </div>
-                                                        <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mt-1 border-t border-stone-200 pt-1 w-full">
+                                                        <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mt-1 border-t border-stone-200 pt-1 w-full text-center">
                                                             {new Date(order.delivery_date + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}
+                                                        </div>
+
+                                                        {/* BIG VISIBLE BADGE */}
+                                                        <div className={`mt-3 w-full text-center text-[10px] font-black uppercase tracking-widest py-1.5 rounded-lg text-white shadow-sm flex items-center justify-center gap-1 ${order.delivery_type === 'pickup' ? 'bg-orange-500' : 'bg-blue-600'}`}>
+                                                            {order.delivery_type === 'pickup' ? (
+                                                                <><span>🏪</span> RETIRA</>
+                                                            ) : (
+                                                                <><span>🚚</span> ENVÍO</>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </td>
