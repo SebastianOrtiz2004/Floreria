@@ -705,114 +705,133 @@ export default function OrdersPage() {
                             </div>
                         )}
 
-                        {/* Group by Hour */}
-                        {Array.from(new Set(filteredOrders.map(o => o.delivery_time.split(':')[0]))).sort().map(hour => {
-                            const ordersInHour = filteredOrders.filter(o => o.delivery_time.startsWith(hour)).sort((a, b) => a.delivery_time.localeCompare(b.delivery_time));
+                        {/* Group by DATE */}
+                        {Array.from(new Set(filteredOrders.map(o => o.delivery_date))).sort().map(date => {
+                            const ordersOnDate = filteredOrders.filter(o => o.delivery_date === date);
 
                             return (
-                                <div key={hour} className="relative">
-                                    {/* Hour Divider */}
-                                    <div className="flex items-center gap-4 mb-4">
-                                        <div className="text-2xl font-black text-stone-300 w-auto md:w-24 text-left md:text-right">{hour}:00</div>
-                                        <div className="h-px flex-1 bg-stone-200 border-t border-dashed border-stone-300"></div>
+                                <div key={date} className="mb-12">
+                                    {/* Date Header */}
+                                    <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm py-3 mb-6 border-b border-stone-200 flex items-center gap-4 shadow-sm">
+                                        <div className="text-lg md:text-xl font-bold text-stone-800 bg-stone-100 px-4 py-2 rounded-xl border border-stone-200 capitalize flex items-center gap-2">
+                                            <span>📅</span>
+                                            {new Date(date + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+                                        </div>
+                                        <div className="text-xs font-bold text-stone-400 bg-stone-50 px-2 py-1 rounded border border-stone-100">
+                                            {ordersOnDate.length} pedidos
+                                        </div>
+                                        <div className="h-px flex-1 bg-stone-200"></div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:ml-28">
-                                        {ordersInHour.map(order => (
-                                            <div key={order.id} onClick={() => setViewingOrder(order)} className="group bg-white rounded-2xl p-4 border border-stone-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer relative overflow-hidden">
-                                                {/* Status Dot */}
-                                                <div className={`absolute top-4 right-4 w-3 h-3 rounded-full ${statusColors[order.status].replace('text-', 'bg-').split(' ')[0]} ring-4 ring-white`}></div>
+                                    {/* Group by HOUR within Date */}
+                                    {Array.from(new Set(ordersOnDate.map(o => o.delivery_time.split(':')[0]))).sort().map(hour => {
+                                        const ordersInHour = ordersOnDate.filter(o => o.delivery_time.startsWith(hour)).sort((a, b) => a.delivery_time.localeCompare(b.delivery_time));
 
-                                                {/* Header: Time & Code */}
-                                                {/* Header: Time & Code */}
-                                                <div className="flex items-center gap-2 mb-3">
-                                                    <div className={`text-white text-xs font-black px-3 py-1.5 rounded-lg shadow-sm tracking-wider ${order.delivery_type === 'pickup' ? 'bg-orange-500' : 'bg-blue-600'}`}>
-                                                        {order.delivery_time.substring(0, 5)}
-                                                        <span className="ml-2 opacity-80 font-medium border-l border-white/30 pl-2">
-                                                            {order.delivery_type === 'pickup' ? 'RETIRO' : 'ENVÍO'}
-                                                        </span>
-                                                    </div>
-                                                    <div className="text-xs font-mono font-bold text-stone-400">
-                                                        #{order.order_code || order.id}
-                                                    </div>
+                                        return (
+                                            <div key={hour} className="relative mb-8 last:mb-0">
+                                                {/* Hour Divider */}
+                                                <div className="flex items-center gap-4 mb-4">
+                                                    <div className="text-2xl font-black text-stone-300 w-auto md:w-24 text-left md:text-right">{hour}:00</div>
+                                                    <div className="h-px flex-1 bg-stone-200 border-t border-dashed border-stone-300"></div>
                                                 </div>
 
-                                                {/* Client */}
-                                                {/* Client */}
-                                                <div className="flex items-center gap-3 mb-4">
-                                                    <div className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 font-bold border border-stone-200 shrink-0">
-                                                        {order.client_name.charAt(0).toUpperCase()}
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <div className="font-bold text-stone-900 text-sm truncate">{order.client_name}</div>
-                                                        {order.recipient_name && <div className="text-xs text-stone-500 truncate">Para: {order.recipient_name}</div>}
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:ml-28">
+                                                    {ordersInHour.map(order => (
+                                                        <div key={order.id} onClick={() => setViewingOrder(order)} className="group bg-white rounded-2xl p-4 border border-stone-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer relative overflow-hidden">
+                                                            {/* Status Dot */}
+                                                            <div className={`absolute top-4 right-4 w-3 h-3 rounded-full ${statusColors[order.status].replace('text-', 'bg-').split(' ')[0]} ring-4 ring-white`}></div>
 
-                                                        {/* Financial Status Badge (ONLY FOR PICKUP) */}
-                                                        {order.delivery_type === 'pickup' && order.total_amount > 0 && (
-                                                            <div className="mt-1 flex gap-2">
-                                                                {(order.total_amount - (order.deposit_amount || 0)) > 0.01 ? (
-                                                                    <span className="text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded shadow-sm border border-red-500 flex items-center gap-1 animate-pulse">
-                                                                        <span>💰</span> Resta: ${(order.total_amount - (order.deposit_amount || 0)).toFixed(2)}
+                                                            {/* Header: Time & Code */}
+                                                            <div className="flex items-center gap-2 mb-3">
+                                                                <div className={`text-white text-xs font-black px-3 py-1.5 rounded-lg shadow-sm tracking-wider ${order.delivery_type === 'pickup' ? 'bg-orange-500' : 'bg-blue-600'}`}>
+                                                                    {order.delivery_time.substring(0, 5)}
+                                                                    <span className="ml-2 opacity-80 font-medium border-l border-white/30 pl-2">
+                                                                        {order.delivery_type === 'pickup' ? 'RETIRO' : 'ENVÍO'}
                                                                     </span>
+                                                                </div>
+                                                                <div className="text-xs font-mono font-bold text-stone-400">
+                                                                    #{order.order_code || order.id}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Client */}
+                                                            <div className="flex items-center gap-3 mb-4">
+                                                                <div className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 font-bold border border-stone-200 shrink-0">
+                                                                    {order.client_name.charAt(0).toUpperCase()}
+                                                                </div>
+                                                                <div className="min-w-0">
+                                                                    <div className="font-bold text-stone-900 text-sm truncate">{order.client_name}</div>
+                                                                    {order.recipient_name && <div className="text-xs text-stone-500 truncate">Para: {order.recipient_name}</div>}
+
+                                                                    {/* Financial Status Badge (ONLY FOR PICKUP) */}
+                                                                    {order.delivery_type === 'pickup' && order.total_amount > 0 && (
+                                                                        <div className="mt-1 flex gap-2">
+                                                                            {(order.total_amount - (order.deposit_amount || 0)) > 0.01 ? (
+                                                                                <span className="text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded shadow-sm border border-red-500 flex items-center gap-1 animate-pulse">
+                                                                                    <span>💰</span> Resta: ${(order.total_amount - (order.deposit_amount || 0)).toFixed(2)}
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="text-[10px] font-bold bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded border border-teal-200">
+                                                                                    Pagado ✅
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Items Preview */}
+                                                            <div className="bg-stone-50 rounded-xl p-3 mb-3 border border-stone-100">
+                                                                {order.items_data && order.items_data.length > 0 ? (
+                                                                    <div className="flex items-center gap-3">
+                                                                        {order.image_url ? (
+                                                                            <div className="w-12 h-12 rounded-lg bg-white shrink-0 overflow-hidden border border-stone-200">
+                                                                                <img src={order.image_url} className="w-full h-full object-cover" />
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="w-12 h-12 rounded-lg bg-white shrink-0 flex items-center justify-center text-xl border border-stone-200">🎁</div>
+                                                                        )}
+                                                                        <div className="flex-1 min-w-0">
+                                                                            <div className="font-bold text-stone-800 text-sm truncate">{order.items_data[0].name}</div>
+                                                                            {order.items_data[0].notes && (
+                                                                                <div className="text-[10px] text-amber-600 font-medium truncate bg-amber-50 px-1 rounded border border-amber-100 mt-0.5">
+                                                                                    📝 {order.items_data[0].notes}
+                                                                                </div>
+                                                                            )}
+                                                                            {order.items_data.length > 1 && (
+                                                                                <div className="text-xs text-stone-500 mt-0.5">+{order.items_data.length - 1} más</div>
+                                                                            )}
+                                                                            <div className="text-xs font-bold text-stone-400 mt-0.5">${order.total_amount.toFixed(2)}</div>
+                                                                        </div>
+                                                                    </div>
                                                                 ) : (
-                                                                    <span className="text-[10px] font-bold bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded border border-teal-200">
-                                                                        Pagado ✅
-                                                                    </span>
+                                                                    <div className="text-xs text-stone-500 italic truncate">{order.items_summary}</div>
                                                                 )}
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                </div>
 
-                                                {/* Items Preview */}
-                                                <div className="bg-stone-50 rounded-xl p-3 mb-3 border border-stone-100">
-                                                    {order.items_data && order.items_data.length > 0 ? (
-                                                        <div className="flex items-center gap-3">
-                                                            {order.image_url ? (
-                                                                <div className="w-12 h-12 rounded-lg bg-white shrink-0 overflow-hidden border border-stone-200">
-                                                                    <img src={order.image_url} className="w-full h-full object-cover" />
-                                                                </div>
-                                                            ) : (
-                                                                <div className="w-12 h-12 rounded-lg bg-white shrink-0 flex items-center justify-center text-xl border border-stone-200">🎁</div>
-                                                            )}
-                                                            <div className="flex-1 min-w-0">
-                                                                <div className="font-bold text-stone-800 text-sm truncate">{order.items_data[0].name}</div>
-                                                                {order.items_data[0].notes && (
-                                                                    <div className="text-[10px] text-amber-600 font-medium truncate bg-amber-50 px-1 rounded border border-amber-100 mt-0.5">
-                                                                        📝 {order.items_data[0].notes}
-                                                                    </div>
+                                                            {/* Footer Actions */}
+                                                            <div className="flex justify-between items-center pt-2 border-t border-stone-100">
+                                                                <button onClick={(e) => { e.stopPropagation(); copyDeliveryInfo(order); }} className="text-xs font-bold text-stone-400 hover:text-stone-600 flex items-center gap-1">
+                                                                    <Icons.Copy /> Copiar
+                                                                </button>
+                                                                {order.client_phone && (
+                                                                    <a
+                                                                        href={`https://wa.me/${order.client_phone.replace(/\D/g, '')}`}
+                                                                        target="_blank"
+                                                                        rel="noreferrer"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        className="text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 p-1.5 rounded-full transition-colors"
+                                                                    >
+                                                                        <Icons.MessageCircle />
+                                                                    </a>
                                                                 )}
-                                                                {order.items_data.length > 1 && (
-                                                                    <div className="text-xs text-stone-500 mt-0.5">+{order.items_data.length - 1} más</div>
-                                                                )}
-                                                                <div className="text-xs font-bold text-stone-400 mt-0.5">${order.total_amount.toFixed(2)}</div>
                                                             </div>
                                                         </div>
-                                                    ) : (
-                                                        <div className="text-xs text-stone-500 italic truncate">{order.items_summary}</div>
-                                                    )}
-                                                </div>
-
-                                                {/* Footer Actions */}
-                                                <div className="flex justify-between items-center pt-2 border-t border-stone-100">
-                                                    <button onClick={(e) => { e.stopPropagation(); copyDeliveryInfo(order); }} className="text-xs font-bold text-stone-400 hover:text-stone-600 flex items-center gap-1">
-                                                        <Icons.Copy /> Copiar
-                                                    </button>
-                                                    {order.client_phone && (
-                                                        <a
-                                                            href={`https://wa.me/${order.client_phone.replace(/\D/g, '')}`}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            onClick={(e) => e.stopPropagation()}
-                                                            className="text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 p-1.5 rounded-full transition-colors"
-                                                        >
-                                                            <Icons.MessageCircle />
-                                                        </a>
-                                                    )}
+                                                    ))}
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
+                                        );
+                                    })}
                                 </div>
                             );
                         })}
