@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/data/products';
+import supabaseLoader from '@/lib/supabase-loader';
 
 interface ProductCardProps {
     product: Product;
@@ -15,11 +16,12 @@ export default function ProductCard({ product }: ProductCardProps) {
     return (
         <div className="group bg-white rounded-lg shadow-sm hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-500 overflow-hidden border border-stone-100/50 hover:border-primary-100 relative flex flex-col h-full">
             {/* Imagen Vertical Elegante - Clickable */}
-            <Link href={`/product/${product.id}`} className="relative h-[250px] md:h-[420px] w-full overflow-hidden bg-white block cursor-pointer">
+            <Link href={`/product/${product.id}`} className="relative h-[250px] md:h-[420px] w-full overflow-hidden bg-stone-100 block cursor-pointer">
                 <Image
                     src={product.image}
                     alt={product.name}
                     fill
+                    loader={supabaseLoader}
                     className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 33vw"
                 />

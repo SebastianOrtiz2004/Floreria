@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import { supabase } from '@/lib/supabase';
+import supabaseLoader from '@/lib/supabase-loader';
 
 // Revalidate data every 60 seconds
 export const revalidate = 60;
@@ -74,11 +75,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-primary-50">
                         <div className="grid grid-cols-1 lg:grid-cols-2">
                             {/* Product Image Side */}
-                            <div className="relative h-[500px] lg:h-[700px] bg-white">
+                            <div className="relative h-[500px] lg:h-[700px] bg-stone-100">
                                 <Image
                                     src={product.image}
                                     alt={product.name}
                                     fill
+                                    loader={supabaseLoader}
                                     className="object-cover"
                                     priority
                                     sizes="(max-width: 1024px) 100vw, 50vw"
