@@ -9,8 +9,43 @@ import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import { supabase } from '@/lib/supabase';
 import supabaseLoader from '@/lib/supabase-loader';
 
-// Revalidate data every 60 seconds
-export const revalidate = 60;
+// Force dynamic rendering to ensure logs are visible immediately
+export const dynamic = 'force-dynamic';
+// export const revalidate = 60; // Disabled for debugging
+
+import { Metadata } from 'next';
+
+// ... (existing imports, but make sure Metadata is imported if not already)
+
+// Generate Metadata safely
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+    try {
+        const { id } = await params;
+        const product = await getProduct(id);
+
+        if (!product) {
+            return {
+                title: 'Producto no encontrado | Florería El Tulipán',
+                description: 'El producto que buscas no está disponible.'
+            };
+        }
+
+        return {
+            title: `${product.name} | Florería El Tulipán`,
+            description: product.description?.slice(0, 160) || 'Hermosos arreglos florales en Ambato.',
+            openGraph: {
+                images: [product.image]
+            }
+        };
+    } catch (error) {
+        console.error("[generateMetadata] Error:", error);
+        return {
+            title: 'Florería El Tulipán',
+            description: 'Arreglos florales exclusivos en Ambato.'
+        };
+    }
+}
+
 
 // Type definition
 interface ProductPageProps {
@@ -105,7 +140,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                                         src={product.image}
                                         alt={product.name}
                                         fill
-                                        loader={supabaseLoader}
+                                        // loader removed for debugging
                                         className="object-cover"
                                         priority
                                         sizes="(max-width: 1024px) 100vw, 50vw"
