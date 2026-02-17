@@ -2,59 +2,63 @@ import Image from 'next/image';
 
 export default function MaintenancePage() {
     return (
-        <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-6 text-center">
-            {/* Contenedor principal con efecto de tarjeta elegante */}
-            <div className="max-w-2xl w-full bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-primary-100 p-8 md:p-12 relative animate-fade-in">
+        <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-black">
+            {/* 1. IMAGEN DE FONDO (Blurred) para atmósfera */}
+            <div className="absolute inset-0 opacity-50 blur-xl scale-110">
+                <Image
+                    src="/images/CuposAgotados.jpeg"
+                    alt="Fondo"
+                    fill
+                    className="object-cover"
+                />
+            </div>
 
-                {/* Elemento decorativo de fondo */}
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary-300 via-primary-500 to-primary-300"></div>
+            {/* Overlay oscuro para legibilidad */}
+            <div className="absolute inset-0 bg-black/60"></div>
 
-                {/* Logo de marca sutil */}
-                <div className="mb-8">
-                    <span className="text-xs font-bold tracking-[0.4em] text-primary-400 uppercase border-b border-primary-100 pb-2">
+            {/* 2. TARJETA CENTRAL (Diseño tipo Historia de Instagram/WhatsApp) */}
+            <div className="relative z-10 w-full max-w-sm mx-auto bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/20 shadow-2xl animate-fade-in flex flex-col">
+
+                {/* Cabecera de la Tarjeta */}
+                <div className="p-6 text-center border-b border-white/10">
+                    <span className="text-[10px] sm:text-xs font-bold tracking-[0.3em] text-white/80 uppercase">
                         Florería El Tulipán
                     </span>
+                    <h1 className="font-serif text-3xl font-medium text-white mt-2 leading-tight">
+                        Gracias por su <br />
+                        <span className="text-primary-200 italic">Preferencia</span>
+                    </h1>
                 </div>
 
-                <h1 className="font-serif text-3xl md:text-5xl font-bold text-primary-900 mb-2 tracking-tight">
-                    ¡Gracias por su Preferencia!
-                </h1>
-
-                <div className="w-24 h-1 bg-primary-200 mx-auto rounded-full my-6"></div>
-
-                <div className="relative w-full aspect-square max-w-sm mx-auto mb-8 rounded-xl overflow-hidden shadow-lg transform hover:scale-[1.02] transition-transform duration-500 group">
+                {/* Imagen Principal */}
+                <div className="relative w-full aspect-square">
                     <Image
                         src="/images/CuposAgotados.jpeg"
                         alt="Cupos Agotados"
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                        className="object-cover"
                         priority
                     />
-                    {/* Overlay sutil */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-primary-900/40 to-transparent"></div>
+                    {/* Badge Sutil */}
+                    <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full border border-white/20">
+                        <span className="text-[10px] font-bold text-white uppercase tracking-widest">Sold Out</span>
+                    </div>
                 </div>
 
-                <h2 className="text-xl md:text-2xl font-bold text-primary-800 tracking-widest uppercase mb-4">
-                    CUPOS AGOTADOS
-                </h2>
+                {/* Cuerpo del Mensaje */}
+                <div className="p-8 text-center bg-white">
+                    <h2 className="text-xl font-bold text-stone-900 tracking-widest uppercase mb-4">
+                        CUPOS AGOTADOS
+                    </h2>
+                    <p className="text-stone-600 text-sm leading-relaxed mb-4">
+                        Queridos clientes, debido a la gran acogida, hemos alcanzado nuestra capacidad máxima.
+                    </p>
+                    <p className="text-stone-500 text-xs italic">
+                        "Cerramos pedidos para garantizar la calidad y frescura en cada detalle que nos caracteriza."
+                    </p>
 
-                <div className="prose prose-stone mx-auto text-stone-600 mb-8 max-w-lg">
-                    <p className="text-lg leading-relaxed font-light">
-                        Queridos clientes, debido a la inmensa acogida, hemos alcanzado nuestra capacidad máxima.
-                    </p>
-                    <p className="text-lg leading-relaxed font-medium text-primary-900 mt-4">
-                        Por el momento ya no estamos receptando pedidos.
-                    </p>
-                    <p className="text-sm mt-6 italic text-stone-400 border-t border-primary-50 pt-4">
-                        Tomamos esta decisión para garantizar que cada arreglo mantenga la calidad,
-                        frescura y el estilo único que nos caracteriza.
-                    </p>
+                    <div className="mt-6 w-12 h-1 bg-primary-200 mx-auto rounded-full"></div>
                 </div>
-            </div>
-
-            {/* Footer minimalista */}
-            <div className="mt-8 text-primary-300 text-xs tracking-wider font-light uppercase">
-                &copy; {new Date().getFullYear()} Florería El Tulipán
             </div>
         </div>
     );
